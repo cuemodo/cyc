@@ -92,7 +92,10 @@ starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads i
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
 the file ("Show Settings File" in the settings window).
 
-## Typing a mapping by hand (until the editor, step 8)
+## Typing a mapping by hand
+
+The editor (Edit Mapping) moves destination corners on the wall. Until step 8b adds quads and
+source rectangles in the settings window, those are typed in the settings file.
 
 Quit Cyc, open the settings file ("Show Settings File"), edit the `mapping` block, and relaunch.
 All numbers are pixels. `source` corners are on the canvas, `destination` corners on the output

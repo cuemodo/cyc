@@ -3,7 +3,7 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-27):** steps 1 to 6 are done, step 7 is in review. Next up: step 8 (mapping editor).
+**Status (2026-10-27):** steps 1 to 7 and 8a are done. Next up: step 8b (mapping window).
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -16,8 +16,9 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 4 | **Fixture.** Address and mode (RGB 3ch, Dim + RGB 4ch, Gradient 6ch, Dim + Gradient 8ch) turn 512 values into top and bottom colors; tests. First time the desk drives the wall | done |
 | 5 | **Settings file.** Save and load JSON: display, universe, address, mode | done |
 | 6 | **Homography math.** Four point pairs to a 3x3 matrix; tests | done |
-| 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | in review |
-| 8 | **Mapping editor on the output.** Grid test pattern, corner handles, drag, keyboard nudge, select quad, undo | |
+| 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | done |
+| 8a | **Edit on the wall.** Edit mode on the output: grid test pattern, quad outlines, corner handles, drag, Tab to select, arrow nudge (Shift: 10 px) | done |
+| 8b | **Manage quads.** Quad list in settings: add, remove, source rectangle on the canvas; undo | |
 | 9 | **Show hardening.** Lock mode, signal-loss behavior, auto-open output at launch, CPU/GPU check next to QLab | |
 
 ## After the show

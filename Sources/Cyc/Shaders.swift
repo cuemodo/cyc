@@ -17,6 +17,7 @@ enum Shaders {
         float3x3 outputToCanvas;  // homography: output pixel -> canvas pixel
         float2 outputSize;        // output size in pixels
         float canvasHeight;       // the gradient runs from canvas y = 0 to this
+        float editing;            // 1 while editing the mapping: draw the grid
     };
 
     struct VertexOut {
@@ -40,8 +41,26 @@ enum Shaders {
                                constant Look &look [[buffer(0)]],
                                constant QuadInfo &quad [[buffer(1)]]) {
         float3 canvas = quad.outputToCanvas * float3(in.position.xy, 1);
-        float v = saturate((canvas.y / canvas.z) / quad.canvasHeight);
+        float2 c = canvas.xy / canvas.z;  // this pixel's spot on the canvas
+        float v = saturate(c.y / quad.canvasHeight);
         float4 color = mix(look.top, look.bottom, v);
+
+        if (quad.editing > 0.5) {
+            // Test grid drawn on the canvas: a thin line every 100 canvas
+            // pixels, a thicker one every 500. Seen through the mapping, the
+            // lines must continue straight across the seam between projectors.
+            // fwidth() is how much a value changes from one output pixel to the
+            // next, which keeps the lines about 1 and 2 output pixels wide.
+            float2 minor = c / 100.0;
+            float2 major = c / 500.0;
+            float2 minorDistance = abs(fract(minor - 0.5) - 0.5) / fwidth(minor);
+            float2 majorDistance = abs(fract(major - 0.5) - 0.5) / fwidth(major);
+            float minorLine = 1.0 - saturate(min(minorDistance.x, minorDistance.y));
+            float majorLine = 1.0 - saturate(min(majorDistance.x, majorDistance.y) / 2.0);
+            float line = max(minorLine * 0.6, majorLine);
+            return float4(max(color.rgb * 0.4, float3(line)), 1);
+        }
+
         if (any(look.top != look.bottom)) {
             // Dithering: a tiny per-pixel random offset (under one 8-bit step)
             // breaks the visible stripes ("banding") of a slow gradient.

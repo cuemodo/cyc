@@ -25,6 +25,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         var outputToCanvas: simd_float3x3
         var outputSize: SIMD2<Float>
         var canvasHeight: Float
+        var editing: Float
     }
 
     /// Fails (returns nil) if the Mac has no Metal GPU or the shader does not compile.
@@ -63,6 +64,14 @@ final class Renderer: NSObject, MTKViewDelegate {
         }
     }
 
+    /// While editing the mapping, the quads show a test grid over a dimmed look.
+    var isEditing = false {
+        didSet {
+            guard isEditing != oldValue else { return }
+            view.needsDisplay = true
+        }
+    }
+
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
 
     func draw(in view: MTKView) {
@@ -85,7 +94,8 @@ final class Renderer: NSObject, MTKViewDelegate {
             var quadUniform = QuadUniform(
                 outputToCanvas: Self.floatMatrix(quad.outputToCanvas.matrix),
                 outputSize: SIMD2(Float(size.width), Float(size.height)),
-                canvasHeight: Float(canvasHeight))
+                canvasHeight: Float(canvasHeight),
+                editing: isEditing ? 1 : 0)
             encoder.setVertexBytes(corners, length: MemoryLayout<SIMD2<Float>>.stride * corners.count, index: 0)
             encoder.setVertexBytes(&quadUniform, length: MemoryLayout<QuadUniform>.stride, index: 1)
             encoder.setFragmentBytes(&quadUniform, length: MemoryLayout<QuadUniform>.stride, index: 1)

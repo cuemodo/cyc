@@ -8,6 +8,13 @@ final class OutputWindow: NSWindow {
     var onEscape: (@MainActor () -> Void)?
     private var cursorHidden = false
 
+    /// Off while editing the mapping, so the pointer stays visible for dragging.
+    var hidesCursor = true {
+        didSet {
+            if !hidesCursor { showCursor() }
+        }
+    }
+
     init(screen: NSScreen) {
         super.init(contentRect: screen.frame, styleMask: .borderless, backing: .buffered, defer: false)
         setFrame(screen.frame, display: false)
@@ -45,7 +52,7 @@ final class OutputWindow: NSWindow {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if !cursorHidden {
+        if hidesCursor && !cursorHidden {
             NSCursor.hide()
             cursorHidden = true
         }

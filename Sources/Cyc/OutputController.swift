@@ -30,14 +30,19 @@ final class OutputController: ObservableObject {
     @Published var testColor = RGB(red: 1, green: 0.7, blue: 0.28) {
         didSet { updateLook() }
     }
-    /// For now edited in the settings file; the mapping editor arrives in step 8.
     @Published var mapping = Mapping() {
-        didSet { renderer?.mapping = mapping }
+        didSet {
+            renderer?.mapping = mapping
+            editor?.mapping = mapping
+        }
     }
+    /// True while the mapping is being edited on the output.
+    @Published private(set) var isEditing = false
 
     private var dmxLevels = DMXInputController.blackout
     private var window: OutputWindow?
     private var renderer: Renderer?
+    private var editor: MappingEditorView?
     private var keepAwake: NSObjectProtocol?
 
     init(input: DMXInputController) {
@@ -93,7 +98,18 @@ final class OutputController: ObservableObject {
         let window = OutputWindow(screen: screen)
         window.contentView = renderer.view
         window.hideCursor(over: renderer.view)
-        window.onEscape = { [weak self] in self?.close() }
+        window.onEscape = { [weak self] in
+            guard let self else { return }
+            if isEditing { stopEditing() } else { close() }
+        }
+
+        // The editor sits on top of the image, hidden until editing starts.
+        let editor = MappingEditorView(frame: renderer.view.bounds)
+        editor.autoresizingMask = [.width, .height]
+        editor.isHidden = true
+        editor.mapping = mapping
+        editor.onChange = { [weak self] mapping in self?.mapping = mapping }
+        renderer.view.addSubview(editor)
         renderer.look = currentLook
         renderer.mapping = mapping
         window.orderFrontRegardless()
@@ -104,18 +120,46 @@ final class OutputController: ObservableObject {
             reason: "Projector output is open")
         self.window = window
         self.renderer = renderer
+        self.editor = editor
         isOpen = true
     }
 
     func close() {
+        stopEditing()
         window?.close()
         window = nil
         renderer = nil
+        editor = nil
         if let keepAwake {
             ProcessInfo.processInfo.endActivity(keepAwake)
         }
         keepAwake = nil
         isOpen = false
+    }
+
+    /// Shows the test grid and corner handles on the output, and gives it the
+    /// keyboard so the arrow keys nudge corners. This takes focus away from
+    /// QLab, so do it before the show, not during.
+    func startEditing() {
+        guard let window, let renderer, let editor, !isEditing else { return }
+        if mapping.quads.isEmpty {
+            let size = renderer.view.drawableSize
+            mapping = .filling(width: size.width, height: size.height)
+        }
+        renderer.isEditing = true
+        editor.isHidden = false
+        window.hidesCursor = false
+        window.makeKeyAndOrderFront(nil)
+        window.makeFirstResponder(editor)
+        isEditing = true
+    }
+
+    func stopEditing() {
+        guard isEditing else { return }
+        renderer?.isEditing = false
+        editor?.isHidden = true
+        window?.hidesCursor = true
+        isEditing = false
     }
 
     private var currentLook: FixtureLook {

@@ -49,7 +49,18 @@ struct SettingsView: View {
             }
             .disabled(output.selectedDisplayID == nil)
 
-            Text("To close from the output itself, click it, then press Esc.")
+            Button(output.isEditing ? "Done Editing Mapping" : "Edit Mapping") {
+                if output.isEditing {
+                    output.stopEditing()
+                } else {
+                    output.startEditing()
+                }
+            }
+            .disabled(!output.isOpen)
+
+            Text(output.isEditing
+                 ? "Editing: drag corners on the output, or Tab to pick one and nudge with the arrows (Shift: 10 px). Esc when done."
+                 : "To close from the output itself, click it, then press Esc.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(mappingText)
