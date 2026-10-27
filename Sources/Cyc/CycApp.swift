@@ -7,8 +7,14 @@ import SwiftUI
 @main
 struct CycApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var output = OutputController()
-    @StateObject private var input = DMXInputController()
+    @StateObject private var input: DMXInputController
+    @StateObject private var output: OutputController
+
+    init() {
+        let input = DMXInputController()
+        _input = StateObject(wrappedValue: input)
+        _output = StateObject(wrappedValue: OutputController(input: input))
+    }
 
     var body: some Scene {
         Window(CycInfo.name, id: "settings") {

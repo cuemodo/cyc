@@ -42,9 +42,12 @@ changes.
 | Mode | Channels | Meaning |
 | --- | --- | --- |
 | RGB | 3 | Red, green, blue for the whole canvas |
-| Dim + RGB | 4 | Master intensity first (scales all colors), then RGB |
+| Dim + RGB | 4 | Intensity first (scales the color), then RGB |
 | Gradient | 6 | Top R, G, B, then bottom R, G, B |
-| Dim + Gradient | 7 | Master intensity, then top RGB, then bottom RGB |
+| Dim + Gradient | 8 | Top dimmer + RGB, then bottom dimmer + RGB |
+
+Gradient modes are simply two RGB (or dimmer + RGB) blocks in a row, so on the desk they patch as
+two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom profile needed.
 
 ## Code layout
 

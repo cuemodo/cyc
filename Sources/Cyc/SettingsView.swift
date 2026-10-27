@@ -1,7 +1,7 @@
 import CycCore
 import SwiftUI
 
-/// The control window. Later steps add fixture and mapping settings here.
+/// The control window. Mapping settings arrive in a later step.
 struct SettingsView: View {
     @EnvironmentObject private var output: OutputController
 
@@ -15,14 +15,23 @@ struct SettingsView: View {
 
             Text("Output")
                 .font(.headline)
-            Picker("Output display", selection: $output.selectedDisplayID) {
+            Picker("Output display", selection: $output.selectedDisplayID.deferredWrites()) {
                 ForEach(output.displays) { display in
                     Text(display.label).tag(Optional(display.id))
                 }
             }
             .disabled(output.isOpen)
 
-            ColorPicker("Test color", selection: testColor, supportsOpacity: false)
+            Picker("Show", selection: $output.source.deferredWrites()) {
+                ForEach(OutputSource.allCases) { source in
+                    Text(source.rawValue).tag(source)
+                }
+            }
+            .pickerStyle(.segmented)
+            .fixedSize()
+
+            ColorPicker("Test color", selection: testColor.deferredWrites(), supportsOpacity: false)
+                .disabled(output.source != .testColor)
 
             Button(output.isOpen ? "Close Output" : "Open Output") {
                 if output.isOpen {
@@ -38,6 +47,9 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
 
             Divider()
+            FixtureView()
+
+            Divider()
             DMXInputView()
         }
         .padding(24)
@@ -47,6 +59,15 @@ struct SettingsView: View {
     private var testColor: Binding<Color> {
         Binding(
             get: { output.testColor.swiftUIColor },
-            set: { output.testColor = RGB($0) })
+            set: { color in
+                // The color picker can echo the current color back (with tiny
+                // rounding changes) while SwiftUI is drawing. Publishing then
+                // triggers "Publishing changes from within view updates", so
+                // only real changes go through.
+                let new = RGB(color)
+                if !new.isClose(to: output.testColor) {
+                    output.testColor = new
+                }
+            })
     }
 }

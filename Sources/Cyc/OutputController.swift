@@ -14,21 +14,43 @@ struct Display: Identifiable, Hashable {
     }
 }
 
-/// Opens and closes the output window and keeps the list of displays fresh.
+/// What the output shows.
+enum OutputSource: String, CaseIterable, Identifiable {
+    case artNet = "Art-Net"
+    case testColor = "Test color"
+
+    var id: Self { self }
+}
+
+/// Opens and closes the output window, keeps the list of displays fresh, and
+/// turns incoming DMX into the look on the projectors.
 @MainActor
 final class OutputController: ObservableObject {
     @Published private(set) var displays: [Display] = []
     @Published var selectedDisplayID: CGDirectDisplayID?
     @Published private(set) var isOpen = false
+    @Published var source = OutputSource.artNet {
+        didSet { updateLook() }
+    }
+    @Published var fixture = Fixture() {
+        didSet { updateLook() }
+    }
     @Published var testColor = RGB(red: 1, green: 0.7, blue: 0.28) {
-        didSet { renderer?.color = testColor }
+        didSet { updateLook() }
     }
 
+    private var dmxLevels = DMXInputController.blackout
     private var window: OutputWindow?
     private var renderer: Renderer?
     private var keepAwake: NSObjectProtocol?
 
-    init() {
+    init(input: DMXInputController) {
+        // Every packet for our universe updates the look straight away (not
+        // throttled like the settings window), so fades on the desk stay smooth.
+        input.onLevels = { [weak self] levels in
+            self?.dmxLevels = levels
+            self?.updateLook()
+        }
         refreshDisplays()
         // Plugging or unplugging a projector changes the list.
         _ = NotificationCenter.default.addObserver(
@@ -68,7 +90,7 @@ final class OutputController: ObservableObject {
         window.contentView = renderer.view
         window.hideCursor(over: renderer.view)
         window.onEscape = { [weak self] in self?.close() }
-        renderer.color = testColor
+        renderer.look = currentLook
         window.orderFrontRegardless()
 
         // Stop the display from sleeping mid-show while nobody touches the Mac.
@@ -89,6 +111,17 @@ final class OutputController: ObservableObject {
         }
         keepAwake = nil
         isOpen = false
+    }
+
+    private var currentLook: FixtureLook {
+        switch source {
+        case .artNet: fixture.look(from: dmxLevels)
+        case .testColor: FixtureLook(solid: testColor)
+        }
+    }
+
+    private func updateLook() {
+        renderer?.look = currentLook
     }
 }
 

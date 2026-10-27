@@ -17,3 +17,6 @@ new entry rather than editing the old one.
 | 2026-10-27 | The output window never takes focus by itself, so QLab keeps the keyboard. |
 | 2026-10-27 | Art-Net universes are shown and stored as the raw 15-bit Port-Address, counted from 0 like Art-Net itself, with a "Net, Sub-Net, Universe" label beside it. |
 | 2026-10-27 | The Art-Net listener uses plain BSD sockets with SO_REUSEADDR and SO_REUSEPORT so other Art-Net apps on the Mac can share port 6454. |
+| 2026-10-27 | Shaders live in a Swift string and are compiled when the output opens, so `swift build` works without Xcode's Metal build step. |
+| 2026-10-27 | The output follows every Art-Net packet straight away (no throttling); only the settings window refreshes at 10 Hz. |
+| 2026-10-27 | Dim + Gradient is 8 channels, one dimmer per color (top DRGB, bottom DRGB), replacing the 7-channel layout: the desk patches it as two generic 4-channel LED fixtures on consecutive addresses. |

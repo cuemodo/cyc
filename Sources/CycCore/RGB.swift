@@ -17,6 +17,15 @@ public struct RGB: Equatable, Sendable {
     public static let black = RGB(red: 0, green: 0, blue: 0)
     public static let white = RGB(red: 1, green: 1, blue: 1)
 
+    /// True when every component differs by less than half an 8-bit step
+    /// (1/510), i.e. the two colors would look identical on the output.
+    public func isClose(to other: RGB) -> Bool {
+        let tolerance = 1.0 / 510
+        return abs(red - other.red) < tolerance
+            && abs(green - other.green) < tolerance
+            && abs(blue - other.blue) < tolerance
+    }
+
     private static func clamp(_ value: Double) -> Double {
         min(max(value, 0), 1)
     }

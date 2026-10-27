@@ -13,8 +13,12 @@ final class DMXInputController: ObservableObject {
             guard universe != oldValue else { return }
             latest = Self.blackout
             latestSender = nil
+            onLevels?(Self.blackout)
         }
     }
+
+    /// Called with all 512 levels each time a packet for `universe` arrives.
+    var onLevels: (@MainActor ([UInt8]) -> Void)?
     @Published private(set) var levels = DMXInputController.blackout
     @Published private(set) var packetsPerSecond = 0
     @Published private(set) var sender: String?
@@ -56,6 +60,7 @@ final class DMXInputController: ObservableObject {
         latest = packet.levels
         latestSender = sender
         packetCount += 1
+        onLevels?(packet.levels)
     }
 
     private func tick() {

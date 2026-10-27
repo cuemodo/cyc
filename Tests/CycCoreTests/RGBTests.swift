@@ -17,4 +17,10 @@ final class RGBTests: XCTestCase {
         XCTAssertEqual(RGB.black, RGB(red: 0, green: 0, blue: 0))
         XCTAssertEqual(RGB.white, RGB(red: 1, green: 1, blue: 1))
     }
+
+    func testIsCloseIgnoresRoundingNoise() {
+        let color = RGB(red: 0.5, green: 0.25, blue: 1)
+        XCTAssertTrue(color.isClose(to: RGB(red: 0.5001, green: 0.2499, blue: 1)))
+        XCTAssertFalse(color.isClose(to: RGB(red: 0.5 + 1.0 / 255, green: 0.25, blue: 1)))
+    }
 }
