@@ -1,0 +1,13 @@
+# Swift Package Manager build output
+.build/
+.swiftpm/
+
+# Xcode
+DerivedData/
+xcuserdata/
+
+# OS files
+.DS_Store
+
+# Claude Code: personal, uncommitted instructions
+CLAUDE.local.md
