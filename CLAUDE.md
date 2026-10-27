@@ -5,6 +5,12 @@ the fixture's channels into a color or a top-to-bottom gradient, and draws it fu
 projector output through a few mapped quads. It runs next to QLab on the same Mac, so it must stay
 light: draw only when something changes.
 
+Read these before larger changes:
+
+- [docs/architecture.md](docs/architecture.md): how the app works, in plain words
+- [docs/roadmap.md](docs/roadmap.md): the step plan and current status (update it as steps land)
+- [docs/decisions.md](docs/decisions.md): dated log of decisions (append new ones)
+
 ## Stack
 
 - Swift Package (`Package.swift`), macOS 14+. SwiftUI for the settings window, AppKit for the

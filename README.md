@@ -25,6 +25,12 @@ Or open `Package.swift` in Xcode and press Run.
 - `Sources/Cyc/`: the macOS app (windows, Metal drawing, settings UI)
 - `Tests/CycCoreTests/`: XCTest tests for CycCore
 
+## Docs
+
+- [Architecture](docs/architecture.md): how it works, in plain words
+- [Roadmap](docs/roadmap.md): the step plan and status
+- [Decisions](docs/decisions.md): dated decision log
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
