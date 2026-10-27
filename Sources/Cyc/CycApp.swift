@@ -26,6 +26,11 @@ struct CycApp: App {
                 .environmentObject(input)
         }
         .windowResizability(.contentSize)
+
+        Window("Mapping", id: "mapping") {
+            MappingWindowView()
+                .environmentObject(output)
+        }
     }
 }
 

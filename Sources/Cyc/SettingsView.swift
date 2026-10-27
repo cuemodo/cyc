@@ -5,6 +5,7 @@ import SwiftUI
 /// The control window. Mapping settings arrive in a later step.
 struct SettingsView: View {
     @EnvironmentObject private var output: OutputController
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -49,18 +50,11 @@ struct SettingsView: View {
             }
             .disabled(output.selectedDisplayID == nil)
 
-            Button(output.isEditing ? "Done Editing Mapping" : "Edit Mapping") {
-                if output.isEditing {
-                    output.stopEditing()
-                } else {
-                    output.startEditing()
-                }
+            Button("Mapping…") {
+                openWindow(id: "mapping")
             }
-            .disabled(!output.isOpen)
 
-            Text(output.isEditing
-                 ? "Editing: drag corners on the output, or Tab to pick one and nudge with the arrows (Shift: 10 px). Esc when done."
-                 : "To close from the output itself, click it, then press Esc.")
+            Text("Show Grid while adjusting the mapping: its lines must run straight across the seam. To close from the output itself, click it, then press Esc.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(mappingText)

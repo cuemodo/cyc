@@ -1,9 +1,11 @@
 import Foundation
 
-/// What the output shows: the fixture driven by Art-Net, or a fixed test color.
+/// What the output shows: the fixture driven by Art-Net, a fixed test color, or
+/// a test grid drawn on the canvas for lining up the mapping on the wall.
 public enum OutputSource: String, CaseIterable, Identifiable, Codable, Sendable {
     case artNet
     case testColor
+    case grid
 
     public var id: Self { self }
 
@@ -11,6 +13,7 @@ public enum OutputSource: String, CaseIterable, Identifiable, Codable, Sendable 
         switch self {
         case .artNet: "Art-Net"
         case .testColor: "Test color"
+        case .grid: "Grid"
         }
     }
 }

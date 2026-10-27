@@ -25,7 +25,41 @@ extension Quad {
     }
 }
 
-/// Names one destination corner in a mapping: which quad, which corner.
+extension Quad {
+    /// True when `point` lies inside the quad (or on its edge). Meant for
+    /// convex quads: the point must be on the same side of all four edges.
+    public func contains(_ point: PixelPoint) -> Bool {
+        let points = corners
+        var sides: [Double] = []
+        for index in 0..<4 {
+            let a = points[index]
+            let b = points[(index + 1) % 4]
+            sides.append((b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x))
+        }
+        return sides.allSatisfy { $0 >= 0 } || sides.allSatisfy { $0 <= 0 }
+    }
+}
+
+/// The two sides of a mapped quad: its patch of the canvas (input), or where
+/// that patch lands on the output.
+public enum MappingSide: Sendable {
+    case source
+    case destination
+}
+
+extension MappedQuad {
+    public subscript(side side: MappingSide) -> Quad {
+        get { side == .source ? source : destination }
+        set {
+            switch side {
+            case .source: source = newValue
+            case .destination: destination = newValue
+            }
+        }
+    }
+}
+
+/// Names one corner of a quad in a mapping: which quad, which corner.
 public struct CornerID: Hashable, Sendable {
     public var quad: Int
     public var corner: Corner
@@ -36,8 +70,9 @@ public struct CornerID: Hashable, Sendable {
     }
 }
 
-/// What the mapping editor does to destination corners (where quads land on
-/// the output). Kept here, away from the UI, so it can be tested.
+/// What the mapping editors do to quads and corners. `side` says whether a
+/// corner is on the canvas (`.source`) or on the output (`.destination`, the
+/// default). Kept here, away from the UI, so it can be tested.
 extension Mapping {
     /// One quad showing the whole canvas on the whole output: the starting
     /// point when editing a mapping that has no quads yet.
@@ -47,19 +82,20 @@ extension Mapping {
                        quads: [MappedQuad(source: full, destination: full)])
     }
 
-    public func corner(_ id: CornerID) -> PixelPoint? {
-        quads.indices.contains(id.quad) ? quads[id.quad].destination[corner: id.corner] : nil
+    public func corner(_ id: CornerID, on side: MappingSide = .destination) -> PixelPoint? {
+        quads.indices.contains(id.quad) ? quads[id.quad][side: side][corner: id.corner] : nil
     }
 
-    /// Every destination corner, quad by quad, clockwise from top-left.
+    /// Every corner, quad by quad, clockwise from top-left.
     public var allCorners: [CornerID] {
         quads.indices.flatMap { quad in Corner.allCases.map { CornerID(quad: quad, corner: $0) } }
     }
 
-    /// The destination corner closest to `point`, if one is within `maxDistance` pixels.
-    public func nearestCorner(to point: PixelPoint, within maxDistance: Double) -> CornerID? {
+    /// The corner closest to `point`, if one is within `maxDistance` pixels.
+    public func nearestCorner(to point: PixelPoint, within maxDistance: Double,
+                              on side: MappingSide = .destination) -> CornerID? {
         func distance(_ id: CornerID) -> Double {
-            guard let corner = corner(id) else { return .infinity }
+            guard let corner = corner(id, on: side) else { return .infinity }
             return ((corner.x - point.x) * (corner.x - point.x) + (corner.y - point.y) * (corner.y - point.y)).squareRoot()
         }
         guard let nearest = allCorners.min(by: { distance($0) < distance($1) }),
@@ -67,13 +103,36 @@ extension Mapping {
         return nearest
     }
 
-    /// The mapping with one destination corner moved, or nil when the move
-    /// would dent the quad or cross its edges (the corner then stays put).
-    public func moving(_ id: CornerID, to point: PixelPoint) -> Mapping? {
+    /// The mapping with one corner moved, or nil when the move would dent the
+    /// quad or cross its edges (the corner then stays put).
+    public func moving(_ id: CornerID, to point: PixelPoint, on side: MappingSide = .destination) -> Mapping? {
         guard quads.indices.contains(id.quad) else { return nil }
         var moved = self
-        moved.quads[id.quad].destination[corner: id.corner] = point
-        return moved.quads[id.quad].destination.isConvex ? moved : nil
+        moved.quads[id.quad][side: side][corner: id.corner] = point
+        return moved.quads[id.quad][side: side].isConvex ? moved : nil
+    }
+
+    /// The last (topmost) quad containing `point`, if any.
+    public func quadIndex(at point: PixelPoint, on side: MappingSide = .destination) -> Int? {
+        quads.indices.last { quads[$0][side: side].contains(point) }
+    }
+
+    /// The mapping with one more quad: a rectangle half the size of the canvas
+    /// in its middle, landing in the middle of the output at half its size.
+    public func addingQuad(outputWidth: Double, outputHeight: Double) -> Mapping {
+        var mapping = self
+        mapping.quads.append(MappedQuad(
+            source: Quad(x: canvasWidth / 4, y: canvasHeight / 4, width: canvasWidth / 2, height: canvasHeight / 2),
+            destination: Quad(x: outputWidth / 4, y: outputHeight / 4, width: outputWidth / 2, height: outputHeight / 2)))
+        return mapping
+    }
+
+    public func removingQuad(at index: Int) -> Mapping {
+        var mapping = self
+        if mapping.quads.indices.contains(index) {
+            mapping.quads.remove(at: index)
+        }
+        return mapping
     }
 
     /// The corner after `id` (or before it, going `backwards`), wrapping from

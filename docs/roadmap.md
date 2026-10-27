@@ -3,7 +3,7 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-27):** steps 1 to 7 and 8a are done. Next up: step 8b (mapping window).
+**Status (2026-10-27):** steps 1 to 8 are done. Next up: step 9 (show hardening).
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -17,8 +17,8 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 5 | **Settings file.** Save and load JSON: display, universe, address, mode | done |
 | 6 | **Homography math.** Four point pairs to a 3x3 matrix; tests | done |
 | 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | done |
-| 8a | **Edit on the wall.** Edit mode on the output: grid test pattern, quad outlines, corner handles, drag, Tab to select, arrow nudge (Shift: 10 px) | done |
-| 8b | **Manage quads.** Quad list in settings: add, remove, source rectangle on the canvas; undo | |
+| 8a | **Edit on the wall.** Edit mode on the output: grid test pattern, quad outlines, corner handles, drag, Tab to select, arrow nudge (Shift: 10 px). Replaced in 8b by the Grid output and the Mapping window | done |
+| 8b | **Mapping window.** Works with the output closed: canvas and output previews, drag or nudge source and destination corners, add and remove quads, canvas size, undo; Grid as a third output choice | done |
 | 9 | **Show hardening.** Lock mode, signal-loss behavior, auto-open output at launch, CPU/GPU check next to QLab | |
 
 ## After the show

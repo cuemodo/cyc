@@ -77,12 +77,19 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 
 ## Mapping editor
 
-- Edit mode shows a grid test pattern and corner handles on the projector output itself, so you
-  align by looking at the wall.
-- Drag corners with the mouse, Tab to select a quad or corner, arrow keys nudge 1 px (Shift for
-  10 px), undo.
-- A preview in the settings window shows the source quads on the canvas.
-- Lock mode for the show: no editing, pointer hidden, display kept awake.
+The **Mapping window** ("Mapping…" in the settings window) works with the output open or closed.
+It shows every quad twice: on the canvas (the patch of the picture it takes) and on the output
+(where it lands). Drag corners on either side, or click a corner and nudge it with the arrow keys
+(Shift: 10 px, Tab for the next corner). Click a quad to select it, add or remove quads, and set the
+canvas size. Edit > Undo (Cmd-Z) undoes each change, and every change saves itself.
+
+A room with four walls of different sizes is four quads: each wall's source patch can have its own
+size and height on the canvas, so the gradient lines up the way you want across walls.
+
+To line up on the wall, set the output to **Grid**: the quads show a white test grid drawn on the
+canvas (a line every 100 canvas pixels, a thicker one every 500). When the mapping is right, the
+lines run straight across the seam between projectors. Moves that would dent a quad or cross its
+edges are refused.
 
 ## Settings
 
@@ -94,8 +101,8 @@ the file ("Show Settings File" in the settings window).
 
 ## Typing a mapping by hand
 
-The editor (Edit Mapping) moves destination corners on the wall. Until step 8b adds quads and
-source rectangles in the settings window, those are typed in the settings file.
+The editors cover everything, but the mapping can also be typed in the settings file, for example
+to start from exact numbers.
 
 Quit Cyc, open the settings file ("Show Settings File"), edit the `mapping` block, and relaunch.
 All numbers are pixels. `source` corners are on the canvas, `destination` corners on the output
