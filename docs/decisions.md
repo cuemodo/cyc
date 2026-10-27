@@ -15,3 +15,5 @@ new entry rather than editing the old one.
 | 2026-10-27 | Fixture modes: RGB 3ch, Dim + RGB 4ch, Gradient 6ch, Dim + Gradient 7ch; dimmer channel first. |
 | 2026-10-27 | Gradient runs top to bottom for now; an angle channel is a later idea (roadmap step 15). |
 | 2026-10-27 | The output window never takes focus by itself, so QLab keeps the keyboard. |
+| 2026-10-27 | Art-Net universes are shown and stored as the raw 15-bit Port-Address, counted from 0 like Art-Net itself, with a "Net, Sub-Net, Universe" label beside it. |
+| 2026-10-27 | The Art-Net listener uses plain BSD sockets with SO_REUSEADDR and SO_REUSEPORT so other Art-Net apps on the Mac can share port 6454. |

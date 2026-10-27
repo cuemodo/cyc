@@ -3,7 +3,7 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-27):** steps 1 and 2 are done. Next up: step 3 (Art-Net in).
+**Status (2026-10-27):** steps 1 to 3 are done. Next up: step 4 (fixture).
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -12,7 +12,7 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | --- | --- | --- |
 | 1 | **Skeleton.** Swift package, settings window, README, MIT license, CI | done |
 | 2 | **Output window.** Pick a display, borderless fullscreen Metal window, test color; pointer hidden, display kept awake, Esc closes | done |
-| 3 | **Art-Net in.** UDP listener on 6454, ArtDmx parser, universe filter, tests from sample packets; settings show live channel values | |
+| 3 | **Art-Net in.** UDP listener on 6454, ArtDmx parser, universe filter, tests from sample packets; settings show live channel values | done |
 | 4 | **Fixture.** Address and mode (RGB, Dim + RGB, Gradient, Dim + Gradient) turn 512 values into top and bottom colors; tests. First time the desk drives the wall | |
 | 5 | **Settings file.** Save and load JSON: display, universe, address, mode | |
 | 6 | **Homography math.** Four point pairs to a 3x3 matrix; tests | |

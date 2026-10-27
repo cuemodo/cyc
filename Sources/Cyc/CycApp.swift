@@ -2,17 +2,19 @@ import AppKit
 import CycCore
 import SwiftUI
 
-/// Entry point: the settings window, plus the projector output window that
-/// `OutputController` opens on demand.
+/// Entry point: the settings window, the projector output window that
+/// `OutputController` opens on demand, and the Art-Net input.
 @main
 struct CycApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var output = OutputController()
+    @StateObject private var input = DMXInputController()
 
     var body: some Scene {
         Window(CycInfo.name, id: "settings") {
             SettingsView()
                 .environmentObject(output)
+                .environmentObject(input)
         }
         .windowResizability(.contentSize)
     }
