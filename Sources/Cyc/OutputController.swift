@@ -30,6 +30,10 @@ final class OutputController: ObservableObject {
     @Published var testColor = RGB(red: 1, green: 0.7, blue: 0.28) {
         didSet { updateLook() }
     }
+    /// For now edited in the settings file; the mapping editor arrives in step 8.
+    @Published var mapping = Mapping() {
+        didSet { renderer?.mapping = mapping }
+    }
 
     private var dmxLevels = DMXInputController.blackout
     private var window: OutputWindow?
@@ -91,6 +95,7 @@ final class OutputController: ObservableObject {
         window.hideCursor(over: renderer.view)
         window.onEscape = { [weak self] in self?.close() }
         renderer.look = currentLook
+        renderer.mapping = mapping
         window.orderFrontRegardless()
 
         // Stop the display from sleeping mid-show while nobody touches the Mac.

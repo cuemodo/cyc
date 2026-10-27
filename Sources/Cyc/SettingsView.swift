@@ -52,6 +52,9 @@ struct SettingsView: View {
             Text("To close from the output itself, click it, then press Esc.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Text(mappingText)
+                .font(.caption)
+                .foregroundStyle(output.mapping.invalidQuadCount == 0 ? Color.secondary : Color.red)
 
             Divider()
             FixtureView()
@@ -61,6 +64,16 @@ struct SettingsView: View {
         }
         .padding(24)
         .frame(minWidth: 560, alignment: .leading)
+    }
+
+    private var mappingText: String {
+        let mapping = output.mapping
+        guard !mapping.quads.isEmpty else { return "Mapping: none, the canvas fills the whole output." }
+        var text = "Mapping: \(mapping.quads.count) quads on a \(Int(mapping.canvasWidth)) x \(Int(mapping.canvasHeight)) canvas."
+        if mapping.invalidQuadCount > 0 {
+            text += " \(mapping.invalidQuadCount) skipped (dented, crossed or squashed)."
+        }
+        return text
     }
 
     private var testColor: Binding<Color> {

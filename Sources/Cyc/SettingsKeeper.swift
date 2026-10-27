@@ -23,7 +23,8 @@ final class SettingsKeeper {
             output.$fixture.map { _ in () }.eraseToAnyPublisher(),
             output.$source.map { _ in () }.eraseToAnyPublisher(),
             output.$testColor.map { _ in () }.eraseToAnyPublisher(),
-            output.$selectedDisplayID.map { _ in () }.eraseToAnyPublisher())
+            output.$selectedDisplayID.map { _ in () }.eraseToAnyPublisher(),
+            output.$mapping.map { _ in () }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 MainActor.assumeIsolated { self?.saveIfChanged() }
@@ -55,6 +56,7 @@ final class SettingsKeeper {
         output.source = settings.source
         output.testColor = settings.testColor
         output.selectDisplay(id: settings.displayID, name: settings.displayName)
+        output.mapping = settings.mapping
     }
 
     private var current: CycSettings {
@@ -65,6 +67,7 @@ final class SettingsKeeper {
         settings.testColor = output.testColor
         settings.displayID = output.selectedDisplayID
         settings.displayName = output.displays.first { $0.id == output.selectedDisplayID }?.name
+        settings.mapping = output.mapping
         return settings
     }
 

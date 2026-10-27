@@ -87,10 +87,53 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 ## Settings
 
 One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds the universe,
-fixture (address and mode), output source, test color and display (quads join it in step 7). It
+fixture (address and mode), output source, test color, display and mapping. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
 the file ("Show Settings File" in the settings window).
+
+## Typing a mapping by hand (until the editor, step 8)
+
+Quit Cyc, open the settings file ("Show Settings File"), edit the `mapping` block, and relaunch.
+All numbers are pixels. `source` corners are on the canvas, `destination` corners on the output
+(the Matrox output is 3840 x 1200: the left projector shows x 0 to 1920, the right one 1920 to
+3840). Corners go clockwise from top-left. With an empty `quads` list the canvas fills the output.
+
+For a hard cut, split the canvas where the seam should be on the wall, give each projector the
+canvas patch it should light, and move its destination corners until the patch lands on the wall
+edge to edge with the other one. Everything outside the quads stays black.
+
+```json
+"mapping" : {
+  "canvasWidth" : 3840,
+  "canvasHeight" : 1200,
+  "quads" : [
+    {
+      "source" : {
+        "topLeft" : { "x" : 0, "y" : 0 },        "topRight" : { "x" : 1920, "y" : 0 },
+        "bottomRight" : { "x" : 1920, "y" : 1200 }, "bottomLeft" : { "x" : 0, "y" : 1200 }
+      },
+      "destination" : {
+        "topLeft" : { "x" : 40, "y" : 30 },       "topRight" : { "x" : 1880, "y" : 0 },
+        "bottomRight" : { "x" : 1900, "y" : 1200 }, "bottomLeft" : { "x" : 0, "y" : 1170 }
+      }
+    },
+    {
+      "source" : {
+        "topLeft" : { "x" : 1920, "y" : 0 },      "topRight" : { "x" : 3840, "y" : 0 },
+        "bottomRight" : { "x" : 3840, "y" : 1200 }, "bottomLeft" : { "x" : 1920, "y" : 1200 }
+      },
+      "destination" : {
+        "topLeft" : { "x" : 1980, "y" : 0 },      "topRight" : { "x" : 3840, "y" : 20 },
+        "bottomRight" : { "x" : 3800, "y" : 1200 }, "bottomLeft" : { "x" : 1960, "y" : 1180 }
+      }
+    }
+  ]
+}
+```
+
+Quads with a dent, crossed edges or squashed corners are skipped; the settings window says how
+many.
 
 ## Risks and gotchas
 

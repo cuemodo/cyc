@@ -12,24 +12,36 @@ enum Shaders {
         float4 bottom;
     };
 
-    struct VertexOut {
-        float4 position [[position]];
-        float v;  // 0 at the top of the screen, 1 at the bottom
+    // Must match `QuadUniform` in Renderer.swift.
+    struct QuadInfo {
+        float3x3 outputToCanvas;  // homography: output pixel -> canvas pixel
+        float2 outputSize;        // output size in pixels
+        float canvasHeight;       // the gradient runs from canvas y = 0 to this
     };
 
-    // One triangle large enough to cover the whole screen, made from the vertex
-    // number alone: no vertex data to upload.
-    vertex VertexOut fullScreen(uint id [[vertex_id]]) {
-        float2 p = float2(float((id << 1) & 2), float(id & 2));  // (0,0), (2,0), (0,2)
+    struct VertexOut {
+        float4 position [[position]];
+    };
+
+    // Places one corner of a quad's triangles. Corners come in output pixels;
+    // the GPU wants "clip space", from -1 to 1 with y pointing up.
+    vertex VertexOut quadVertex(uint id [[vertex_id]],
+                                constant float2 *corners [[buffer(0)]],
+                                constant QuadInfo &quad [[buffer(1)]]) {
+        float2 p = corners[id] / quad.outputSize;
         VertexOut out;
         out.position = float4(p.x * 2 - 1, 1 - p.y * 2, 0, 1);
-        out.v = p.y;
         return out;
     }
 
-    // Blends the top color into the bottom color.
-    fragment float4 gradient(VertexOut in [[stage_in]], constant Look &look [[buffer(0)]]) {
-        float4 color = mix(look.top, look.bottom, saturate(in.v));
+    // Runs once per output pixel inside a quad: finds where that pixel comes
+    // from on the canvas, then takes the look's color at that height.
+    fragment float4 mappedLook(VertexOut in [[stage_in]],
+                               constant Look &look [[buffer(0)]],
+                               constant QuadInfo &quad [[buffer(1)]]) {
+        float3 canvas = quad.outputToCanvas * float3(in.position.xy, 1);
+        float v = saturate((canvas.y / canvas.z) / quad.canvasHeight);
+        float4 color = mix(look.top, look.bottom, v);
         if (any(look.top != look.bottom)) {
             // Dithering: a tiny per-pixel random offset (under one 8-bit step)
             // breaks the visible stripes ("banding") of a slow gradient.
