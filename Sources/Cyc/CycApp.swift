@@ -2,15 +2,17 @@ import AppKit
 import CycCore
 import SwiftUI
 
-/// Entry point. For now the app is a single settings window; the projector
-/// output window arrives in the next step.
+/// Entry point: the settings window, plus the projector output window that
+/// `OutputController` opens on demand.
 @main
 struct CycApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @StateObject private var output = OutputController()
 
     var body: some Scene {
         Window(CycInfo.name, id: "settings") {
             SettingsView()
+                .environmentObject(output)
         }
         .windowResizability(.contentSize)
     }
