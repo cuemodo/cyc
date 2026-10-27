@@ -3,17 +3,20 @@ import CycCore
 import SwiftUI
 
 /// Entry point: the settings window, the projector output window that
-/// `OutputController` opens on demand, and the Art-Net input.
+/// `OutputController` opens on demand, the Art-Net input, and the saved settings.
 @main
 struct CycApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var input: DMXInputController
     @StateObject private var output: OutputController
+    @State private var settingsKeeper: SettingsKeeper
 
     init() {
         let input = DMXInputController()
+        let output = OutputController(input: input)
         _input = StateObject(wrappedValue: input)
-        _output = StateObject(wrappedValue: OutputController(input: input))
+        _output = StateObject(wrappedValue: output)
+        _settingsKeeper = State(initialValue: SettingsKeeper(input: input, output: output))
     }
 
     var body: some Scene {

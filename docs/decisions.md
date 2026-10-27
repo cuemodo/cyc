@@ -20,3 +20,4 @@ new entry rather than editing the old one.
 | 2026-10-27 | Shaders live in a Swift string and are compiled when the output opens, so `swift build` works without Xcode's Metal build step. |
 | 2026-10-27 | The output follows every Art-Net packet straight away (no throttling); only the settings window refreshes at 10 Hz. |
 | 2026-10-27 | Dim + Gradient is 8 channels, one dimmer per color (top DRGB, bottom DRGB), replacing the 7-channel layout: the desk patches it as two generic 4-channel LED fixtures on consecutive addresses. |
+| 2026-10-27 | Settings are one versioned JSON file in Application Support (`"format": "cuemodo-cyc-settings"`), saved automatically; missing values fall back to defaults. The output display is remembered by ID with its name as a fallback. |

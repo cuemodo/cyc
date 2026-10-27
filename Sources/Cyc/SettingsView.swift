@@ -1,3 +1,4 @@
+import AppKit
 import CycCore
 import SwiftUI
 
@@ -9,8 +10,14 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(CycInfo.name)
                 .font(.title)
-            Text("Version \(CycInfo.version)")
-                .foregroundStyle(.secondary)
+            HStack {
+                Text("Version \(CycInfo.version)")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("Show Settings File") {
+                    NSWorkspace.shared.activateFileViewerSelecting([SettingsFile.defaultURL])
+                }
+            }
             Divider()
 
             Text("Output")
@@ -24,7 +31,7 @@ struct SettingsView: View {
 
             Picker("Show", selection: $output.source.deferredWrites()) {
                 ForEach(OutputSource.allCases) { source in
-                    Text(source.rawValue).tag(source)
+                    Text(source.name).tag(source)
                 }
             }
             .pickerStyle(.segmented)

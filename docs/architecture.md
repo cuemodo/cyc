@@ -86,8 +86,11 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 
 ## Settings
 
-One JSON file holds protocol, universe, address, mode, display and quads, with export and import
-for backup.
+One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds the universe,
+fixture (address and mode), output source, test color and display (quads join it in step 7). It
+starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
+it half a second after the last change and at quit. To back it up or move it to another Mac, copy
+the file ("Show Settings File" in the settings window).
 
 ## Risks and gotchas
 

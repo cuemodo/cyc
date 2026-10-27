@@ -3,7 +3,7 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-27):** steps 1 to 4 are done. Next up: step 5 (settings file).
+**Status (2026-10-27):** steps 1 to 5 are done. Next up: step 6 (homography math).
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -14,7 +14,7 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 2 | **Output window.** Pick a display, borderless fullscreen Metal window, test color; pointer hidden, display kept awake, Esc closes | done |
 | 3 | **Art-Net in.** UDP listener on 6454, ArtDmx parser, universe filter, tests from sample packets; settings show live channel values | done |
 | 4 | **Fixture.** Address and mode (RGB 3ch, Dim + RGB 4ch, Gradient 6ch, Dim + Gradient 8ch) turn 512 values into top and bottom colors; tests. First time the desk drives the wall | done |
-| 5 | **Settings file.** Save and load JSON: display, universe, address, mode | |
+| 5 | **Settings file.** Save and load JSON: display, universe, address, mode | done |
 | 6 | **Homography math.** Four point pairs to a 3x3 matrix; tests | |
 | 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | |
 | 8 | **Mapping editor on the output.** Grid test pattern, corner handles, drag, keyboard nudge, select quad, undo | |

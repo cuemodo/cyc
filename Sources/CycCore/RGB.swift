@@ -30,3 +30,18 @@ public struct RGB: Equatable, Sendable {
         min(max(value, 0), 1)
     }
 }
+
+extension RGB: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case red, green, blue
+    }
+
+    /// Goes through `init(red:green:blue:)` so values from a file are clamped too.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            red: try container.decode(Double.self, forKey: .red),
+            green: try container.decode(Double.self, forKey: .green),
+            blue: try container.decode(Double.self, forKey: .blue))
+    }
+}

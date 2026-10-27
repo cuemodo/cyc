@@ -14,14 +14,6 @@ struct Display: Identifiable, Hashable {
     }
 }
 
-/// What the output shows.
-enum OutputSource: String, CaseIterable, Identifiable {
-    case artNet = "Art-Net"
-    case testColor = "Test color"
-
-    var id: Self { self }
-}
-
 /// Opens and closes the output window, keeps the list of displays fresh, and
 /// turns incoming DMX into the look on the projectors.
 @MainActor
@@ -79,6 +71,14 @@ final class OutputController: ObservableObject {
             // Prefer an external display: the main one is usually the laptop.
             let main = NSScreen.main?.displayID
             selectedDisplayID = displays.last(where: { $0.id != main })?.id ?? displays.first?.id
+        }
+    }
+
+    /// Picks a saved display: the same ID if it is still connected, otherwise
+    /// one with the same name (IDs can change after a restart or replug).
+    func selectDisplay(id: CGDirectDisplayID?, name: String?) {
+        if let match = displays.first(where: { $0.id == id }) ?? displays.first(where: { $0.name == name }) {
+            selectedDisplayID = match.id
         }
     }
 
