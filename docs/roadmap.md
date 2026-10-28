@@ -30,7 +30,7 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 11 | **Second output.** Separate window and quads per display, for setups with two cables | not needed for now |
 | 12 | **Edge blend.** Soft fade across quad edges, adjustable width and curve | |
 | 13 | **Fixture profiles.** Hog, QLab and Cuemodo fixture definitions; short user guide | |
-| 14 | **Signing.** Wrap into a .app, Developer ID signing and notarization | |
+| 14 | **Signing.** Wrap into a .app, Developer ID signing and notarization | done |
 | 15 | **Gradient angle.** One more channel rotates the gradient (Gradient RGB + Angle 7ch, Gradient DRGB + Angle 9ch) | |
 | 16a | **Syphon in.** Add the Syphon framework (BSD, Metal client), list the Syphon servers on the Mac, a Video choice in Show with a server picker; redraw on each new frame | |
 | 16b | **Video through the mapping.** The shader samples the video frame at each canvas point instead of the gradient, so quads map video too; optionally the Art-Net dimmer fades the video | |

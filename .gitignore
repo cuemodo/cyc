@@ -11,3 +11,6 @@ xcuserdata/
 
 # Claude Code: personal, uncommitted instructions
 CLAUDE.local.md
+
+# Packaged app (scripts/package.sh)
+dist/

@@ -179,4 +179,5 @@ next to QLab.
   needed.
 - **Color match between projectors.** Two models rarely match; a per-output color trim is a cheap
   later addition.
-- **Unsigned builds.** Fine on your own Mac; other Macs need Developer ID signing (roadmap step 14).
+- **Signed builds only for other Macs.** `swift run` builds are unsigned and fine on your own Mac;
+  to copy the app to the show Mac, use the notarized zip from `scripts/package.sh`.
