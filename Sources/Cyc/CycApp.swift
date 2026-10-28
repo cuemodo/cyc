@@ -36,7 +36,16 @@ struct CycApp: App {
                         .applicationName: CycInfo.name,
                         .applicationVersion: CycInfo.version,
                         .version: "",
+                        .credits: aboutCredits,
                     ])
+                }
+            }
+            CommandGroup(replacing: .help) {
+                Button("Cuemodo Website") {
+                    NSWorkspace.shared.open(CycInfo.website)
+                }
+                Button("\(CycInfo.name) on GitHub") {
+                    NSWorkspace.shared.open(CycInfo.sourceCode)
                 }
             }
         }
@@ -54,6 +63,18 @@ extension NSImage {
     static func resource(_ name: String) -> NSImage? {
         Bundle.module.url(forResource: name, withExtension: "png").flatMap(NSImage.init(contentsOf:))
     }
+}
+
+/// The About panel's small print: a link to cuemodo.io, centered like the
+/// rest of the panel.
+private var aboutCredits: NSAttributedString {
+    let paragraph = NSMutableParagraphStyle()
+    paragraph.alignment = .center
+    return NSAttributedString(string: "cuemodo.io", attributes: [
+        .link: CycInfo.website,
+        .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+        .paragraphStyle: paragraph,
+    ])
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
