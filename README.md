@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/cuemodo-lockup-horizontal-on-dark.svg">
+  <img src="docs/images/cuemodo-lockup-horizontal-on-light.svg" alt="Cuemodo" width="400">
+</picture>
+
 # Cuemodo Cyc
 
 Turn projectors into one DMX-controlled light. Cuemodo Cyc is a small macOS app that listens for
@@ -22,7 +27,7 @@ Or open `Package.swift` in Xcode and press Run.
 ## Layout
 
 - `Sources/CycCore/`: logic that needs no screen (DMX, fixture modes, mapping math), unit tested
-- `Sources/Cyc/`: the macOS app (windows, Metal drawing, settings UI)
+- `Sources/Cyc/`: the macOS app (windows, Metal drawing, main window UI)
 - `Tests/CycCoreTests/`: XCTest tests for CycCore
 
 ## Docs
