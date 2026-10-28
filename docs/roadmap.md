@@ -3,8 +3,8 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-28):** steps 1 to 8 are done, plus UI polish (main window, branding). Step 9 is
-built and waiting for testing (see [show-checklist.md](show-checklist.md)). Next up: step 9 (show hardening).
+**Status (2026-10-28):** steps 1 to 9 are done: the show-ready version is complete. Next: run
+[show-checklist.md](show-checklist.md) on the real rig before the dress rehearsal.
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -20,7 +20,7 @@ built and waiting for testing (see [show-checklist.md](show-checklist.md)). Next
 | 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | done |
 | 8a | **Edit on the wall.** Edit mode on the output: grid test pattern, quad outlines, corner handles, drag, Tab to select, arrow nudge (Shift: 10 px). Replaced in 8b by the Grid output and the Mapping window | done |
 | 8b | **Mapping window.** Works with the output closed: canvas and output previews, drag or nudge source and destination corners, add and remove quads, canvas size, undo; Grid as a third output choice | done |
-| 9 | **Show hardening.** Lock mode, signal-loss behavior (hold or fade to black), reopen the output after a display drop-out, quit confirmation; show checklist with the CPU/GPU check next to QLab | built, to test |
+| 9 | **Show hardening.** Lock mode, signal-loss behavior (hold or fade to black), reopen the output after a display drop-out, quit confirmation; show checklist with the CPU/GPU check next to QLab | done |
 
 ## After the show
 
