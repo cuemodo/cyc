@@ -13,6 +13,7 @@ struct CornerSelection: Equatable {
 struct MappingWindowView: View {
     @EnvironmentObject private var output: OutputController
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.dismissWindow) private var dismissWindow
     @State private var selectedQuad: Int?
     @State private var selectedCorner: CornerSelection?
 
@@ -32,6 +33,17 @@ struct MappingWindowView: View {
                 QuadSideEditor(side: .destination, width: output.outputPixelSize.width,
                                height: output.outputPixelSize.height,
                                selectedQuad: $selectedQuad, selectedCorner: $selectedCorner)
+                Spacer()
+                HStack {
+                    Spacer()
+                    // Every change is already live and saved; Done just says so.
+                    Button("Done") {
+                        dismissWindow(id: "mapping")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .help("Close the Mapping window. Changes are already on the output and saved.")
+                }
             }
         }
         .padding(16)

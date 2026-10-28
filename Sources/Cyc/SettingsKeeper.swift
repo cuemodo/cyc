@@ -44,6 +44,26 @@ final class SettingsKeeper {
             .store(in: &subscriptions)
     }
 
+    /// Back to the default settings, keeping the chosen display.
+    func resetToDefaults() {
+        var settings = CycSettings()
+        settings.displayID = output.selectedDisplayID
+        settings.displayName = current.displayName
+        apply(settings)
+        saveIfChanged()
+    }
+
+    /// Replaces the current settings with a file saved earlier.
+    func load(from otherURL: URL) throws {
+        apply(try SettingsFile.load(from: otherURL))
+        saveIfChanged()
+    }
+
+    /// Writes a copy of the current settings.
+    func save(to otherURL: URL) throws {
+        try SettingsFile.save(current, to: otherURL)
+    }
+
     private func load() {
         guard FileManager.default.fileExists(atPath: url.path) else { return }
         do {

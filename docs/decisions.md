@@ -28,3 +28,4 @@ new entry rather than editing the old one.
 | 2026-10-28 | Mode names use channel letters like fixture manuals and desk libraries: RGB, DRGB, Gradient RGB, Gradient DRGB (D = dimmer). Saved values are unchanged. |
 | 2026-10-28 | Syphon video input is planned after the show (steps 16a and 16b): adding an Objective-C framework this close to the dress rehearsal risks the build. |
 | 2026-10-28 | Show hardening: signal loss holds the last look by default (fade to black is an option), no auto-start at launch (not needed), the output reopens when its display comes back, Lock survives a relaunch, Cmd-Q asks while the output is live. |
+| 2026-10-28 | Settings files per show: File > New / Open… / Save As… work on copies; the app keeps one working settings file that saves itself, so there is no document window or unsaved state to lose mid-show. |

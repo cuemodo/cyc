@@ -100,14 +100,19 @@ fixture (address and mode), output source, Manual colors, display, mapping and t
 below. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
-the file ("Show Settings File" in the main window).
+the file (File > Show Settings File in Finder).
+
+The File menu works on copies: **Save Settings As…** (Cmd-S) writes the current settings anywhere,
+for example one file per show; **Open Settings…** (Cmd-O) loads such a file back in; **New
+Settings** (Cmd-N) starts fresh from the defaults, keeping the chosen display. Open and New ask
+first and are off while the show is locked. The app's own file keeps saving itself either way.
 
 ## Typing a mapping by hand
 
 The editors cover everything, but the mapping can also be typed in the settings file, for example
 to start from exact numbers.
 
-Quit Cyc, open the settings file ("Show Settings File"), edit the `mapping` block, and relaunch.
+Quit Cyc, open the settings file (File > Show Settings File in Finder), edit the `mapping` block, and relaunch.
 All numbers are pixels. `source` corners are on the canvas, `destination` corners on the output
 (the Matrox output is 3840 x 1200: the left projector shows x 0 to 1920, the right one 1920 to
 3840). Corners go clockwise from top-left. With an empty `quads` list the canvas fills the output.

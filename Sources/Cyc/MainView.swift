@@ -23,9 +23,6 @@ struct MainView: View {
                 Text(CycInfo.name.lowercased())
                     .brandTitle()
                 Spacer()
-                Button("Show Settings File") {
-                    NSWorkspace.shared.activateFileViewerSelecting([SettingsFile.defaultURL])
-                }
                 lockButton
             }
             Divider()
