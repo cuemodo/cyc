@@ -27,6 +27,9 @@ final class CycSettingsTests: XCTestCase {
         settings.manualBottom = RGB(red: 1, green: 0, blue: 0)
         settings.displayID = 42
         settings.displayName = "Matrox DualHead2Go"
+        settings.signalLoss = .fadeToBlack
+        settings.signalLossTimeout = 10
+        settings.locked = true
 
         let url = folder.appendingPathComponent("nested/settings.json")
         try SettingsFile.save(settings, to: url)

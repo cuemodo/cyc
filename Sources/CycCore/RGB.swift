@@ -26,6 +26,11 @@ public struct RGB: Equatable, Sendable {
             && abs(blue - other.blue) < tolerance
     }
 
+    /// The same color at `level` (0...1) of its brightness.
+    public func scaled(by level: Double) -> RGB {
+        RGB(red: red * level, green: green * level, blue: blue * level)
+    }
+
     private static func clamp(_ value: Double) -> Double {
         min(max(value, 0), 1)
     }

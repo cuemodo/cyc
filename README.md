@@ -35,6 +35,7 @@ Or open `Package.swift` in Xcode and press Run.
 - [Architecture](docs/architecture.md): how it works, in plain words
 - [Roadmap](docs/roadmap.md): the step plan and status
 - [Decisions](docs/decisions.md): dated decision log
+- [Show checklist](docs/show-checklist.md): setup, CPU/GPU check, before each show
 
 ## License
 

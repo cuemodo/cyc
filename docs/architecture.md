@@ -96,7 +96,8 @@ edges are refused.
 ## Settings
 
 One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds the universe,
-fixture (address and mode), output source, Manual colors, display and mapping. It
+fixture (address and mode), output source, Manual colors, display, mapping and the show options
+below. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
 the file ("Show Settings File" in the main window).
@@ -146,6 +147,22 @@ edge to edge with the other one. Everything outside the quads stays black.
 
 Quads with a dent, crossed edges or squashed corners are skipped; the main window says how
 many.
+
+## Show safety
+
+- **Signal loss.** If Art-Net stops (desk, node or cable), the output either holds the last look
+  (default) or fades to black over 2 s, after a timeout you choose (5 s by default). The main
+  window says so in red. The next packet brings the look straight back.
+- **Display at launch.** If the saved display is not connected yet (projectors switched on after
+  the Mac), it is selected as soon as it shows up.
+- **Display drop-out.** If the projectors' display disappears while the output is open, the output
+  reopens on it when it comes back.
+- **Lock.** The Lock button makes the main and Mapping windows ignore clicks and keys, and Esc on
+  the output does nothing. It stays locked after a relaunch.
+- **Quit.** Cmd-Q asks first while the output is live.
+
+See [show-checklist.md](show-checklist.md) for the steps before a show, including the CPU/GPU check
+next to QLab.
 
 ## Risks and gotchas
 

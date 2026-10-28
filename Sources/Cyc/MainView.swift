@@ -3,7 +3,7 @@ import CycCore
 import SwiftUI
 
 /// The main window: the output, then only the controls for what it shows
-/// (Art-Net, Manual or Test Pattern). Explanations live in tooltips (hover a
+/// (Art-Net, Manual or Test Pattern), and the show lock. Explanations live in tooltips (hover a
 /// control), so only problems show as text.
 struct MainView: View {
     @EnvironmentObject private var output: OutputController
@@ -26,64 +26,69 @@ struct MainView: View {
                 Button("Show Settings File") {
                     NSWorkspace.shared.activateFileViewerSelecting([SettingsFile.defaultURL])
                 }
+                lockButton
             }
             Divider()
 
-            Text("Output")
-                .sectionTitle()
-            HStack(alignment: .center, spacing: 16) {
-                outputButton
-                // A grid, so both pickers start at the same left edge
-                // whatever the length of their labels.
-                Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 10) {
-                    GridRow {
-                        Text("Display")
-                            .gridColumnAlignment(.trailing)
-                        HStack {
-                            Picker("Display", selection: $output.selectedDisplayID.deferredWrites()) {
-                                ForEach(output.displays) { display in
-                                    Text(display.label).tag(Optional(display.id))
+            // Show lock: nothing below reacts until unlocked.
+            Group {
+                Text("Output")
+                    .sectionTitle()
+                HStack(alignment: .center, spacing: 16) {
+                    outputButton
+                    // A grid, so both pickers start at the same left edge
+                    // whatever the length of their labels.
+                    Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 10) {
+                        GridRow {
+                            Text("Display")
+                                .gridColumnAlignment(.trailing)
+                            HStack {
+                                Picker("Display", selection: $output.selectedDisplayID.deferredWrites()) {
+                                    ForEach(output.displays) { display in
+                                        Text(display.label).tag(Optional(display.id))
+                                    }
+                                }
+                                .labelsHidden()
+                                .disabled(output.isOpen)
+                                Button("Mapping…") {
+                                    openWindow(id: "mapping")
+                                }
+                                .help(mappingText)
+                            }
+                        }
+                        GridRow {
+                            Text("Show")
+                            Picker("Show", selection: $output.source.deferredWrites()) {
+                                ForEach(OutputSource.allCases) { source in
+                                    Text(source.name).tag(source)
                                 }
                             }
                             .labelsHidden()
-                            .disabled(output.isOpen)
-                            Button("Mapping…") {
-                                openWindow(id: "mapping")
-                            }
-                            .help(mappingText)
+                            .pickerStyle(.segmented)
+                            .fixedSize()
+                            .help("Test Pattern draws a white grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
                         }
-                    }
-                    GridRow {
-                        Text("Show")
-                        Picker("Show", selection: $output.source.deferredWrites()) {
-                            ForEach(OutputSource.allCases) { source in
-                                Text(source.name).tag(source)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.segmented)
-                        .fixedSize()
-                        .help("Test Pattern draws a white grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
                     }
                 }
-            }
 
-            if output.mapping.invalidQuadCount > 0 {
-                Text("\(output.mapping.invalidQuadCount) quads skipped (dented, crossed or squashed).")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
+                if output.mapping.invalidQuadCount > 0 {
+                    Text("\(output.mapping.invalidQuadCount) quads skipped (dented, crossed or squashed).")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
 
-            switch output.source {
-            case .artNet:
-                Divider()
-                ArtNetView()
-            case .manual:
-                Divider()
-                manualControls
-            case .testPattern:
-                EmptyView()
+                switch output.source {
+                case .artNet:
+                    Divider()
+                    ArtNetView()
+                case .manual:
+                    Divider()
+                    manualControls
+                case .testPattern:
+                    EmptyView()
+                }
             }
+            .disabled(output.isLocked)
         }
         .padding(24)
         .frame(minWidth: 560, alignment: .leading)
@@ -113,6 +118,22 @@ struct MainView: View {
             .fixedSize()
             .help("Manual shows these colors instead of Art-Net.")
         }
+    }
+
+    /// Locks the windows for the show, so a stray click or key press can't
+    /// change anything. Stays locked after a relaunch.
+    private var lockButton: some View {
+        Button {
+            output.isLocked.toggle()
+        } label: {
+            Label(output.isLocked ? "Locked" : "Lock",
+                  systemImage: output.isLocked ? "lock.fill" : "lock.open")
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(output.isLocked ? Brand.amber : .gray)
+        .help(output.isLocked
+              ? "Locked for the show: controls, the Mapping window and Esc on the output are ignored. Click to unlock."
+              : "Lock everything for the show, so a stray click or key press changes nothing.")
     }
 
     /// Big and colored so it reads from across the room: green Play while

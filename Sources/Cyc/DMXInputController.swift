@@ -13,6 +13,7 @@ final class DMXInputController: ObservableObject {
             guard universe != oldValue else { return }
             latest = Self.blackout
             latestSender = nil
+            lastPacketUptime = nil
             onLevels?(Self.blackout)
         }
     }
@@ -23,6 +24,9 @@ final class DMXInputController: ObservableObject {
     @Published private(set) var packetsPerSecond = 0
     @Published private(set) var sender: String?
     @Published private(set) var error: String?
+    /// When the last packet for `universe` arrived (seconds since the Mac
+    /// started, which never jumps like the clock can). Nil: none yet.
+    private(set) var lastPacketUptime: TimeInterval?
 
     static let blackout = [UInt8](repeating: 0, count: ArtDmxPacket.channelCount)
 
@@ -59,6 +63,7 @@ final class DMXInputController: ObservableObject {
         guard packet.universe == universe else { return }
         latest = packet.levels
         latestSender = sender
+        lastPacketUptime = ProcessInfo.processInfo.systemUptime
         packetCount += 1
         onLevels?(packet.levels)
     }

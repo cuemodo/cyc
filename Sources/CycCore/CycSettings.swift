@@ -53,6 +53,11 @@ public struct CycSettings: Equatable, Sendable {
     public var displayName: String?
     /// Where the canvas lands on the output. Empty means "fill the whole output".
     public var mapping = Mapping()
+    /// What to do when Art-Net stops, and after how many seconds of silence.
+    public var signalLoss = SignalLoss.hold
+    public var signalLossTimeout = 5.0
+    /// Show lock: the windows ignore clicks and keys until unlocked.
+    public var locked = false
 
     public init() {}
 }
@@ -74,6 +79,7 @@ public enum SettingsError: Error, Equatable, CustomStringConvertible {
 extension CycSettings: Codable {
     private enum CodingKeys: String, CodingKey {
         case format, version, universe, fixture, source, manualGradient, manualTop, manualBottom, displayID, displayName, mapping
+        case signalLoss, signalLossTimeout, locked
         case testColor  // before 0.0.10, read only
     }
 
@@ -96,6 +102,9 @@ extension CycSettings: Codable {
         displayID = try container.decodeIfPresent(UInt32.self, forKey: .displayID)
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
         mapping = try container.decodeIfPresent(Mapping.self, forKey: .mapping) ?? mapping
+        signalLoss = try container.decodeIfPresent(SignalLoss.self, forKey: .signalLoss) ?? signalLoss
+        signalLossTimeout = try container.decodeIfPresent(Double.self, forKey: .signalLossTimeout) ?? signalLossTimeout
+        locked = try container.decodeIfPresent(Bool.self, forKey: .locked) ?? locked
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -111,6 +120,9 @@ extension CycSettings: Codable {
         try container.encodeIfPresent(displayID, forKey: .displayID)
         try container.encodeIfPresent(displayName, forKey: .displayName)
         try container.encode(mapping, forKey: .mapping)
+        try container.encode(signalLoss, forKey: .signalLoss)
+        try container.encode(signalLossTimeout, forKey: .signalLossTimeout)
+        try container.encode(locked, forKey: .locked)
     }
 }
 

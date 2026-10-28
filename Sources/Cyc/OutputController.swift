@@ -39,13 +39,28 @@ final class OutputController: ObservableObject {
     @Published var mapping = Mapping() {
         didSet { renderer?.mapping = mapping }
     }
+    @Published var signalLoss = SignalLoss.hold
+    @Published var signalLossTimeout = 5.0
+    /// Show lock: the windows ignore clicks, and Esc no longer closes the output.
+    @Published var isLocked = false
+    /// True after `signalLossTimeout` seconds without Art-Net.
+    @Published private(set) var signalLost = false
 
+    private let input: DMXInputController
     private var dmxLevels = DMXInputController.blackout
+    /// 1 normally, going down to 0 while fading to black after signal loss.
+    private var signalLevel = 1.0
+    /// A display we want but that is not connected (yet): the saved one at
+    /// launch (selected when it shows up), or the one the output was on when
+    /// it disappeared (the output reopens on it).
+    private var pendingDisplay: (id: CGDirectDisplayID?, name: String?, reopen: Bool)?
     private var window: OutputWindow?
     private var renderer: Renderer?
     private var keepAwake: NSObjectProtocol?
+    private var signalTimer: Timer?
 
     init(input: DMXInputController) {
+        self.input = input
         // Every packet for our universe updates the look straight away (not
         // throttled like the main window), so fades on the desk stay smooth.
         input.onLevels = { [weak self] levels in
@@ -61,9 +76,15 @@ final class OutputController: ObservableObject {
         ) { [weak self] _ in
             Task { @MainActor in self?.refreshDisplays() }
         }
+        let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.checkSignal() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        signalTimer = timer
     }
 
     func refreshDisplays() {
+        let previous = displays.first { $0.id == selectedDisplayID }
         displays = NSScreen.screens.compactMap { screen in
             guard let id = screen.displayID else { return nil }
             let scale = screen.backingScaleFactor
@@ -73,8 +94,19 @@ final class OutputController: ObservableObject {
                 pixelSize: CGSize(width: screen.frame.width * scale, height: screen.frame.height * scale))
         }
         if let selected = selectedDisplayID, !displays.contains(where: { $0.id == selected }) {
+            // The projectors went away (Matrox or cable glitch): wait for them
+            // to come back, and reopen the output if it was open.
+            pendingDisplay = (previous?.id, previous?.name, isOpen)
             close()
             selectedDisplayID = nil
+        }
+        if let pending = pendingDisplay,
+           let match = displays.first(where: { $0.id == pending.id }) ?? displays.first(where: { $0.name == pending.name }) {
+            selectedDisplayID = match.id
+            pendingDisplay = nil
+            if pending.reopen {
+                open()
+            }
         }
         if selectedDisplayID == nil {
             // Prefer an external display: the main one is usually the laptop.
@@ -107,8 +139,11 @@ final class OutputController: ObservableObject {
     func selectDisplay(id: CGDirectDisplayID?, name: String?) {
         if let match = displays.first(where: { $0.id == id }) ?? displays.first(where: { $0.name == name }) {
             selectedDisplayID = match.id
+        } else if id != nil || name != nil {
+            pendingDisplay = (id, name, false)
         }
     }
+
 
     func open() {
         guard !isOpen,
@@ -117,7 +152,10 @@ final class OutputController: ObservableObject {
         let window = OutputWindow(screen: screen)
         window.contentView = renderer.view
         window.hideCursor(over: renderer.view)
-        window.onEscape = { [weak self] in self?.close() }
+        window.onEscape = { [weak self] in
+            guard let self, !self.isLocked else { return }
+            self.close()
+        }
         renderer.look = currentLook
         renderer.showsGrid = source == .testPattern
         renderer.mapping = mapping
@@ -145,9 +183,26 @@ final class OutputController: ObservableObject {
 
     private var currentLook: FixtureLook {
         switch source {
-        case .artNet: fixture.look(from: dmxLevels)
+        case .artNet: fixture.look(from: dmxLevels).scaled(by: signalLevel)
         case .manual: FixtureLook(top: manualTop, bottom: manualGradient ? manualBottom : manualTop)
         case .testPattern: .black
+        }
+    }
+
+    /// Runs 20 times a second: notices when Art-Net stops and drives the fade
+    /// to black, if that is what `signalLoss` asks for.
+    private func checkSignal() {
+        let silence = input.lastPacketUptime.map { ProcessInfo.processInfo.systemUptime - $0 }
+        let timeout = max(signalLossTimeout, 1)  // a typo of 0 must not flicker
+        let lost = (silence ?? 0) > timeout
+        if lost != signalLost {
+            signalLost = lost
+        }
+        let level = signalLoss.level(silence: silence, timeout: timeout)
+        guard level != signalLevel else { return }
+        signalLevel = level
+        if source == .artNet {
+            updateLook()
         }
     }
 

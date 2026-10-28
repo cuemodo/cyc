@@ -17,6 +17,7 @@ struct CycApp: App {
         _input = StateObject(wrappedValue: input)
         _output = StateObject(wrappedValue: output)
         _settingsKeeper = State(initialValue: SettingsKeeper(input: input, output: output))
+        AppDelegate.output = output
     }
 
     var body: some Scene {
@@ -53,6 +54,7 @@ struct CycApp: App {
         Window("Mapping", id: "mapping") {
             MappingWindowView()
                 .environmentObject(output)
+                .disabled(output.isLocked)
                 .cuemodoWindow()
         }
     }
@@ -78,6 +80,9 @@ private var aboutCredits: NSAttributedString {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Set by `CycApp`, so quitting can check whether the output is live.
+    @MainActor static weak var output: OutputController?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // `swift run` starts us as a plain command-line process. Ask macOS to
         // treat it as a normal app, with a Dock icon and a focused window.
@@ -89,5 +94,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
+    }
+
+    /// A stray Cmd-Q mid-show would black out the wall: ask first while the
+    /// output is open.
+    @MainActor
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard Self.output?.isOpen == true else { return .terminateNow }
+        let alert = NSAlert()
+        alert.messageText = "The output is live."
+        alert.informativeText = "Quitting \(CycInfo.name) turns the projectors' image off."
+        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Quit")
+        return alert.runModal() == .alertSecondButtonReturn ? .terminateNow : .terminateCancel
     }
 }

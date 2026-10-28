@@ -51,6 +51,36 @@ struct ArtNetView: View {
                     .help(channelsText)
                     .gridCellColumns(3)
                 }
+                GridRow {
+                    Text("Signal loss")
+                    HStack {
+                        Picker("Signal loss", selection: $output.signalLoss.deferredWrites()) {
+                            ForEach(SignalLoss.allCases) { behavior in
+                                Text(behavior.name).tag(behavior)
+                            }
+                        }
+                        .labelsHidden()
+                        .fixedSize()
+                        // Hold does nothing over time, so no delay to set.
+                        if output.signalLoss == .fadeToBlack {
+                            Text("after")
+                            TextField("Seconds", value: $output.signalLossTimeout.deferredWrites(), format: .number)
+                                .labelsHidden()
+                                .frame(width: 40)
+                            Text("s without Art-Net")
+                        }
+                    }
+                    .fixedSize()
+                    .help("If the desk, the node or a cable fails: keep the last look, or fade to black over \(Int(SignalLoss.fadeDuration)) s. The next packet brings the look back.")
+                    .gridCellColumns(3)
+                }
+            }
+            if output.signalLost {
+                Text(output.signalLoss == .hold
+                     ? "Art-Net lost: holding the last look."
+                     : "Art-Net lost: faded to black.")
+                    .font(.caption)
+                    .foregroundStyle(.red)
             }
             if !output.fixture.fitsInUniverse {
                 Text(channelsText)

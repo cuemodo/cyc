@@ -26,7 +26,10 @@ final class SettingsKeeper {
             output.$manualBottom.map { _ in () }.eraseToAnyPublisher(),
             output.$manualGradient.map { _ in () }.eraseToAnyPublisher(),
             output.$selectedDisplayID.map { _ in () }.eraseToAnyPublisher(),
-            output.$mapping.map { _ in () }.eraseToAnyPublisher())
+            output.$mapping.map { _ in () }.eraseToAnyPublisher(),
+            output.$signalLoss.map { _ in () }.eraseToAnyPublisher(),
+            output.$signalLossTimeout.map { _ in () }.eraseToAnyPublisher(),
+            output.$isLocked.map { _ in () }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 MainActor.assumeIsolated { self?.saveIfChanged() }
@@ -61,6 +64,9 @@ final class SettingsKeeper {
         output.manualGradient = settings.manualGradient
         output.selectDisplay(id: settings.displayID, name: settings.displayName)
         output.mapping = settings.mapping
+        output.signalLoss = settings.signalLoss
+        output.signalLossTimeout = settings.signalLossTimeout
+        output.isLocked = settings.locked
     }
 
     private var current: CycSettings {
@@ -74,6 +80,9 @@ final class SettingsKeeper {
         settings.displayID = output.selectedDisplayID
         settings.displayName = output.displays.first { $0.id == output.selectedDisplayID }?.name
         settings.mapping = output.mapping
+        settings.signalLoss = output.signalLoss
+        settings.signalLossTimeout = output.signalLossTimeout
+        settings.locked = output.isLocked
         return settings
     }
 

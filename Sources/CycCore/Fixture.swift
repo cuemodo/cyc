@@ -56,6 +56,11 @@ public struct FixtureLook: Equatable, Sendable {
     }
 
     public static let black = FixtureLook(solid: .black)
+
+    /// The same look at `level` (0...1) of its brightness.
+    public func scaled(by level: Double) -> FixtureLook {
+        FixtureLook(top: top.scaled(by: level), bottom: bottom.scaled(by: level))
+    }
 }
 
 /// The virtual fixture: where it sits in the DMX universe and how it reads its channels.

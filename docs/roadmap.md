@@ -3,7 +3,8 @@
 Each step is one reviewable commit, a few hundred lines at most, and ends with something you can
 run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 
-**Status (2026-10-27):** steps 1 to 8 are done. Next up: step 9 (show hardening).
+**Status (2026-10-28):** steps 1 to 8 are done, plus UI polish (main window, branding). Step 9 is
+built and waiting for testing (see [show-checklist.md](show-checklist.md)). Next up: step 9 (show hardening).
 **Deadline:** dress rehearsal on Sunday 2026-11-01, so steps 1 to 9 must land by Saturday Oct 31.
 
 ## Show-ready version
@@ -19,7 +20,7 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 7 | **Mapped render.** Shader draws N quads with source and destination corners, black elsewhere, dithering; quads read from JSON | done |
 | 8a | **Edit on the wall.** Edit mode on the output: grid test pattern, quad outlines, corner handles, drag, Tab to select, arrow nudge (Shift: 10 px). Replaced in 8b by the Grid output and the Mapping window | done |
 | 8b | **Mapping window.** Works with the output closed: canvas and output previews, drag or nudge source and destination corners, add and remove quads, canvas size, undo; Grid as a third output choice | done |
-| 9 | **Show hardening.** Lock mode, signal-loss behavior, auto-open output at launch, CPU/GPU check next to QLab | |
+| 9 | **Show hardening.** Lock mode, signal-loss behavior (hold or fade to black), reopen the output after a display drop-out, quit confirmation; show checklist with the CPU/GPU check next to QLab | built, to test |
 
 ## After the show
 
@@ -31,3 +32,5 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 13 | **Fixture profiles.** Hog, QLab and Cuemodo fixture definitions; short user guide | |
 | 14 | **Signing.** Wrap into a .app, Developer ID signing and notarization | |
 | 15 | **Gradient angle.** One more channel rotates the gradient (Gradient RGB + Angle 7ch, Gradient DRGB + Angle 9ch) | |
+| 16a | **Syphon in.** Add the Syphon framework (BSD, Metal client), list the Syphon servers on the Mac, a Video choice in Show with a server picker; redraw on each new frame | |
+| 16b | **Video through the mapping.** The shader samples the video frame at each canvas point instead of the gradient, so quads map video too; optionally the Art-Net dimmer fades the video | |
