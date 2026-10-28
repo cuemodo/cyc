@@ -101,13 +101,14 @@ extension Mapping {
     }
 
     /// The corner closest to `point`, if one is within `maxDistance` pixels.
+    /// When corners of several quads share a spot, the last (topmost) quad wins.
     public func nearestCorner(to point: PixelPoint, within maxDistance: Double,
                               on side: MappingSide = .destination) -> CornerID? {
         func distance(_ id: CornerID) -> Double {
             guard let corner = corner(id, on: side) else { return .infinity }
             return ((corner.x - point.x) * (corner.x - point.x) + (corner.y - point.y) * (corner.y - point.y)).squareRoot()
         }
-        guard let nearest = allCorners.min(by: { distance($0) < distance($1) }),
+        guard let nearest = allCorners.reversed().min(by: { distance($0) < distance($1) }),
               distance(nearest) <= maxDistance else { return nil }
         return nearest
     }
