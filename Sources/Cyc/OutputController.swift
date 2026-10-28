@@ -27,7 +27,10 @@ final class OutputController: ObservableObject {
     @Published var fixture = Fixture() {
         didSet { updateLook() }
     }
-    @Published var testColor = RGB(red: 1, green: 0.7, blue: 0.28) {
+    @Published var manualTop = CycSettings().manualTop {
+        didSet { updateLook() }
+    }
+    @Published var manualBottom = CycSettings().manualBottom {
         didSet { updateLook() }
     }
     @Published var mapping = Mapping() {
@@ -140,7 +143,7 @@ final class OutputController: ObservableObject {
     private var currentLook: FixtureLook {
         switch source {
         case .artNet: fixture.look(from: dmxLevels)
-        case .testColor: FixtureLook(solid: testColor)
+        case .manual: FixtureLook(top: manualTop, bottom: fixture.mode.isGradient ? manualBottom : manualTop)
         case .grid: .black
         }
     }

@@ -1,10 +1,11 @@
 import Foundation
 
-/// What the output shows: the fixture driven by Art-Net, a fixed test color, or
-/// a test grid drawn on the canvas for lining up the mapping on the wall.
+/// What the output shows: the fixture driven by Art-Net, colors picked by hand
+/// in the app, or a test grid drawn on the canvas for lining up the mapping on
+/// the wall.
 public enum OutputSource: String, CaseIterable, Identifiable, Codable, Sendable {
     case artNet
-    case testColor
+    case manual
     case grid
 
     public var id: Self { self }
@@ -12,9 +13,19 @@ public enum OutputSource: String, CaseIterable, Identifiable, Codable, Sendable 
     public var name: String {
         switch self {
         case .artNet: "Art-Net"
-        case .testColor: "Test color"
+        case .manual: "Manual"
         case .grid: "Grid"
         }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        // "testColor" is what Manual was called before 0.0.10.
+        guard let source = raw == "testColor" ? .manual : OutputSource(rawValue: raw) else {
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath,
+                                                    debugDescription: "Unknown output source \(raw)"))
+        }
+        self = source
     }
 }
 
@@ -30,7 +41,9 @@ public struct CycSettings: Equatable, Sendable {
     public var universe = 0
     public var fixture = Fixture()
     public var source = OutputSource.artNet
-    public var testColor = RGB(red: 1, green: 0.7, blue: 0.28)
+    /// The Manual colors. Solid modes use only the top one.
+    public var manualTop = RGB(red: 1, green: 0.7, blue: 0.28)
+    public var manualBottom = RGB(red: 0.1, green: 0.2, blue: 0.8)
     /// The output display. macOS display IDs can change after a restart or
     /// replug, so its name is kept as a fallback.
     public var displayID: UInt32?
@@ -57,7 +70,8 @@ public enum SettingsError: Error, Equatable, CustomStringConvertible {
 
 extension CycSettings: Codable {
     private enum CodingKeys: String, CodingKey {
-        case format, version, universe, fixture, source, testColor, displayID, displayName, mapping
+        case format, version, universe, fixture, source, manualTop, manualBottom, displayID, displayName, mapping
+        case testColor  // before 0.0.10, read only
     }
 
     public init(from decoder: Decoder) throws {
@@ -72,7 +86,9 @@ extension CycSettings: Codable {
         universe = try container.decodeIfPresent(Int.self, forKey: .universe) ?? universe
         fixture = try container.decodeIfPresent(Fixture.self, forKey: .fixture) ?? fixture
         source = try container.decodeIfPresent(OutputSource.self, forKey: .source) ?? source
-        testColor = try container.decodeIfPresent(RGB.self, forKey: .testColor) ?? testColor
+        manualTop = try container.decodeIfPresent(RGB.self, forKey: .manualTop)
+            ?? container.decodeIfPresent(RGB.self, forKey: .testColor) ?? manualTop
+        manualBottom = try container.decodeIfPresent(RGB.self, forKey: .manualBottom) ?? manualBottom
         displayID = try container.decodeIfPresent(UInt32.self, forKey: .displayID)
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
         mapping = try container.decodeIfPresent(Mapping.self, forKey: .mapping) ?? mapping
@@ -85,7 +101,8 @@ extension CycSettings: Codable {
         try container.encode(universe, forKey: .universe)
         try container.encode(fixture, forKey: .fixture)
         try container.encode(source, forKey: .source)
-        try container.encode(testColor, forKey: .testColor)
+        try container.encode(manualTop, forKey: .manualTop)
+        try container.encode(manualBottom, forKey: .manualBottom)
         try container.encodeIfPresent(displayID, forKey: .displayID)
         try container.encodeIfPresent(displayName, forKey: .displayName)
         try container.encode(mapping, forKey: .mapping)

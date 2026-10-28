@@ -1,9 +1,10 @@
 import CycCore
 import SwiftUI
 
-/// Art-Net settings and a live view of the 512 channel levels.
+/// Art-Net settings and, on demand, a live view of the 512 channel levels.
 struct DMXInputView: View {
     @EnvironmentObject private var input: DMXInputController
+    @AppStorage("showsLevels") private var showsLevels = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -14,10 +15,19 @@ struct DMXInputView: View {
                 + Text("  (\(ArtDmxPacket.label(universe: UInt16(input.universe))))")
                     .foregroundColor(.secondary)
             }
-            Text(input.statusText)
-                .font(.caption)
-                .foregroundStyle(input.error == nil ? Color.secondary : Color.red)
-            LevelGrid(levels: input.levels)
+            HStack {
+                Text(input.statusText)
+                    .font(.caption)
+                    .foregroundStyle(input.error == nil ? Color.secondary : Color.red)
+                Spacer()
+                Button(showsLevels ? "Hide Levels" : "Show Levels") {
+                    showsLevels.toggle()
+                }
+                .help("The 512 channel levels received on this universe.")
+            }
+            if showsLevels {
+                LevelGrid(levels: input.levels)
+            }
         }
     }
 }

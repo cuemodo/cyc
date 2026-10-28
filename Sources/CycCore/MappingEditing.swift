@@ -1,6 +1,15 @@
 /// One of a quad's four corners.
 public enum Corner: Int, CaseIterable, Sendable {
     case topLeft, topRight, bottomRight, bottomLeft
+
+    public var name: String {
+        switch self {
+        case .topLeft: "Top left"
+        case .topRight: "Top right"
+        case .bottomRight: "Bottom right"
+        case .bottomLeft: "Bottom left"
+        }
+    }
 }
 
 extension Quad {

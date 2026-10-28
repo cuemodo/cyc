@@ -15,6 +15,7 @@ struct FixtureView: View {
                 }
             }
             .fixedSize()
+            .help(channelsText)
             HStack {
                 Text("DMX address")
                 TextField("", value: $output.fixture.address, format: .number)
@@ -22,9 +23,12 @@ struct FixtureView: View {
                 Stepper("", value: $output.fixture.address, in: 1...512)
                     .labelsHidden()
             }
-            Text(channelsText)
-                .font(.caption)
-                .foregroundStyle(output.fixture.fitsInUniverse ? Color.secondary : Color.red)
+            .help(channelsText)
+            if !output.fixture.fitsInUniverse {
+                Text(channelsText)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
         }
     }
 

@@ -21,8 +21,9 @@ final class CycSettingsTests: XCTestCase {
         var settings = CycSettings()
         settings.universe = 3
         settings.fixture = Fixture(address: 101, mode: .dimGradient)
-        settings.source = .testColor
-        settings.testColor = RGB(red: 0, green: 0.5, blue: 1)
+        settings.source = .manual
+        settings.manualTop = RGB(red: 0, green: 0.5, blue: 1)
+        settings.manualBottom = RGB(red: 1, green: 0, blue: 0)
         settings.displayID = 42
         settings.displayName = "Matrox DualHead2Go"
 
@@ -60,8 +61,17 @@ final class CycSettingsTests: XCTestCase {
     func testColorsFromAFileAreClamped() throws {
         let settings = try decode(#"""
             {"format": "cuemodo-cyc-settings", "version": 1,
-             "testColor": {"red": 2, "green": -1, "blue": 0.5}}
+             "manualTop": {"red": 2, "green": -1, "blue": 0.5}}
             """#)
-        XCTAssertEqual(settings.testColor, RGB(red: 1, green: 0, blue: 0.5))
+        XCTAssertEqual(settings.manualTop, RGB(red: 1, green: 0, blue: 0.5))
+    }
+
+    func testReadsTestColorFromOlderFiles() throws {
+        let settings = try decode(#"""
+            {"format": "cuemodo-cyc-settings", "version": 1, "source": "testColor",
+             "testColor": {"red": 0, "green": 1, "blue": 0}}
+            """#)
+        XCTAssertEqual(settings.source, .manual)
+        XCTAssertEqual(settings.manualTop, RGB(red: 0, green: 1, blue: 0))
     }
 }

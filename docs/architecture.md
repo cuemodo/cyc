@@ -80,8 +80,10 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 The **Mapping window** ("Mapping…" in the settings window) works with the output open or closed.
 It shows every quad twice: on the canvas (the patch of the picture it takes) and on the output
 (where it lands). Drag corners on either side, or click a corner and nudge it with the arrow keys
-(Shift: 10 px, Tab for the next corner). Click a quad to select it, add or remove quads, and set the
-canvas size. Edit > Undo (Cmd-Z) undoes each change, and every change saves itself.
+(Shift: 10 px, Tab for the next corner). Click a quad to select it: its corners are listed as
+numbers (canvas and output) in the sidebar, boxed so you can see which corner is selected, and
+can be typed exactly or stepped with the up / down arrows. Add or remove quads, and set the canvas
+size. Edit > Undo (Cmd-Z) undoes each change, and every change saves itself.
 
 A room with four walls of different sizes is four quads: each wall's source patch can have its own
 size and height on the canvas, so the gradient lines up the way you want across walls.
@@ -94,7 +96,7 @@ edges are refused.
 ## Settings
 
 One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds the universe,
-fixture (address and mode), output source, test color, display and mapping. It
+fixture (address and mode), output source, Manual colors, display and mapping. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
 the file ("Show Settings File" in the settings window).
