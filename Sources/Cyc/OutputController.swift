@@ -44,7 +44,7 @@ final class OutputController: ObservableObject {
 
     init(input: DMXInputController) {
         // Every packet for our universe updates the look straight away (not
-        // throttled like the settings window), so fades on the desk stay smooth.
+        // throttled like the main window), so fades on the desk stay smooth.
         input.onLevels = { [weak self] levels in
             self?.dmxLevels = levels
             self?.updateLook()

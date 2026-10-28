@@ -13,7 +13,7 @@ Read these before larger changes:
 
 ## Stack
 
-- Swift Package (`Package.swift`), macOS 14+. SwiftUI for the settings window, AppKit for the
+- Swift Package (`Package.swift`), macOS 14+. SwiftUI for the main window, AppKit for the
   fullscreen output window, Metal for drawing.
 - `CycCore` holds everything testable without a screen; `Cyc` is the app. Keep logic out of views.
 - Tests use XCTest (`swift test`).

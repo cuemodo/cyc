@@ -53,7 +53,7 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 
 - `Sources/CycCore/`: everything testable without a screen: colors, DMX parsing, fixture modes,
   mapping math, settings. Unit tested with XCTest.
-- `Sources/Cyc/`: the app. SwiftUI settings window, AppKit output window, Metal renderer.
+- `Sources/Cyc/`: the app. SwiftUI main window (`MainView`), AppKit output window, Metal renderer.
 - Values are normalized (0.0 to 1.0) inside the app; DMX bytes are converted at the edge.
 
 ## Signal path
@@ -77,7 +77,7 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 
 ## Mapping editor
 
-The **Mapping window** ("Mapping…" in the settings window) works with the output open or closed.
+The **Mapping window** ("Mapping…" in the main window) works with the output open or closed.
 It shows every quad twice: on the canvas (the patch of the picture it takes) and on the output
 (where it lands). Drag corners on either side, or click a corner and nudge it with the arrow keys
 (Shift: 10 px, Tab for the next corner). Click a quad to select it: its corners are listed as
@@ -99,7 +99,7 @@ One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds 
 fixture (address and mode), output source, Manual colors, display and mapping. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves
 it half a second after the last change and at quit. To back it up or move it to another Mac, copy
-the file ("Show Settings File" in the settings window).
+the file ("Show Settings File" in the main window).
 
 ## Typing a mapping by hand
 
@@ -144,7 +144,7 @@ edge to edge with the other one. Everything outside the quads stays black.
 }
 ```
 
-Quads with a dent, crossed edges or squashed corners are skipped; the settings window says how
+Quads with a dent, crossed edges or squashed corners are skipped; the main window says how
 many.
 
 ## Risks and gotchas

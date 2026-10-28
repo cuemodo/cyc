@@ -3,7 +3,7 @@ import Foundation
 
 /// Receives Art-Net and keeps the levels of the chosen universe.
 ///
-/// Packets arrive about 44 times a second. The settings window only needs a
+/// Packets arrive about 44 times a second. The main window only needs a
 /// few updates a second, so `levels` is refreshed 10 times a second.
 @MainActor
 final class DMXInputController: ObservableObject {

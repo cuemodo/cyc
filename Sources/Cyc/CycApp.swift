@@ -2,7 +2,7 @@ import AppKit
 import CycCore
 import SwiftUI
 
-/// Entry point: the settings window, the projector output window that
+/// Entry point: the main window, the projector output window that
 /// `OutputController` opens on demand, the Art-Net input, and the saved settings.
 @main
 struct CycApp: App {
@@ -20,8 +20,8 @@ struct CycApp: App {
     }
 
     var body: some Scene {
-        Window(CycInfo.name, id: "settings") {
-            SettingsView()
+        Window(CycInfo.name, id: "main") {
+            MainView()
                 .environmentObject(output)
                 .environmentObject(input)
                 .cuemodoWindow()

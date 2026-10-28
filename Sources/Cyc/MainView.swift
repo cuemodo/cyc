@@ -2,9 +2,9 @@ import AppKit
 import CycCore
 import SwiftUI
 
-/// The control window. Explanations live in tooltips (hover a control), so
-/// only problems show as text.
-struct SettingsView: View {
+/// The main window: output, fixture and Art-Net input. Explanations live in
+/// tooltips (hover a control), so only problems show as text.
+struct MainView: View {
     @EnvironmentObject private var output: OutputController
     @Environment(\.openWindow) private var openWindow
 
