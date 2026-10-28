@@ -33,6 +33,9 @@ final class OutputController: ObservableObject {
     @Published var manualBottom = CycSettings().manualBottom {
         didSet { updateLook() }
     }
+    @Published var manualGradient = CycSettings().manualGradient {
+        didSet { updateLook() }
+    }
     @Published var mapping = Mapping() {
         didSet { renderer?.mapping = mapping }
     }
@@ -116,7 +119,7 @@ final class OutputController: ObservableObject {
         window.hideCursor(over: renderer.view)
         window.onEscape = { [weak self] in self?.close() }
         renderer.look = currentLook
-        renderer.showsGrid = source == .grid
+        renderer.showsGrid = source == .testPattern
         renderer.mapping = mapping
         window.orderFrontRegardless()
 
@@ -143,14 +146,14 @@ final class OutputController: ObservableObject {
     private var currentLook: FixtureLook {
         switch source {
         case .artNet: fixture.look(from: dmxLevels)
-        case .manual: FixtureLook(top: manualTop, bottom: fixture.mode.isGradient ? manualBottom : manualTop)
-        case .grid: .black
+        case .manual: FixtureLook(top: manualTop, bottom: manualGradient ? manualBottom : manualTop)
+        case .testPattern: .black
         }
     }
 
     private func updateLook() {
         renderer?.look = currentLook
-        renderer?.showsGrid = source == .grid
+        renderer?.showsGrid = source == .testPattern
     }
 }
 

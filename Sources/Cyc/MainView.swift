@@ -2,8 +2,9 @@ import AppKit
 import CycCore
 import SwiftUI
 
-/// The main window: output, fixture and Art-Net input. Explanations live in
-/// tooltips (hover a control), so only problems show as text.
+/// The main window: the output, then only the controls for what it shows
+/// (Art-Net, Manual or Test Pattern). Explanations live in tooltips (hover a
+/// control), so only problems show as text.
 struct MainView: View {
     @EnvironmentObject private var output: OutputController
     @Environment(\.openWindow) private var openWindow
@@ -54,21 +55,15 @@ struct MainView: View {
                     }
                     GridRow {
                         Text("Show")
-                        // One cell, so the colors sit right after the picker.
-                        HStack(spacing: 0) {
-                            Picker("Show", selection: $output.source.deferredWrites()) {
-                                ForEach(OutputSource.allCases) { source in
-                                    Text(source.name).tag(source)
-                                }
-                            }
-                            .labelsHidden()
-                            .pickerStyle(.segmented)
-                            .fixedSize()
-                            .help("Grid draws a white test grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
-                            if output.source == .manual {
-                                manualColors
+                        Picker("Show", selection: $output.source.deferredWrites()) {
+                            ForEach(OutputSource.allCases) { source in
+                                Text(source.name).tag(source)
                             }
                         }
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+                        .fixedSize()
+                        .help("Test Pattern draws a white grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
                     }
                 }
             }
@@ -79,28 +74,45 @@ struct MainView: View {
                     .foregroundStyle(.red)
             }
 
-            Divider()
-            FixtureView()
-
-            Divider()
-            DMXInputView()
+            switch output.source {
+            case .artNet:
+                Divider()
+                ArtNetView()
+            case .manual:
+                Divider()
+                manualControls
+            case .testPattern:
+                EmptyView()
+            }
         }
         .padding(24)
         .frame(minWidth: 560, alignment: .leading)
     }
 
-    private var manualColors: some View {
-        HStack(spacing: 12) {
-            if output.fixture.mode.isGradient {
-                ColorPicker("Top", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
-                ColorPicker("Bottom", selection: color(\.manualBottom).deferredWrites(), supportsOpacity: false)
-            } else {
-                ColorPicker("Color", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+    /// Solid or gradient, and its colors. Kept apart from the fixture mode so
+    /// trying things here never changes the Art-Net patch.
+    private var manualControls: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Manual")
+                .sectionTitle()
+            HStack(spacing: 16) {
+                Picker("Look", selection: $output.manualGradient.deferredWrites()) {
+                    Text("Solid").tag(false)
+                    Text("Gradient").tag(true)
+                }
+                .labelsHidden()
+                .pickerStyle(.segmented)
+                .fixedSize()
+                if output.manualGradient {
+                    ColorPicker("Top", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+                    ColorPicker("Bottom", selection: color(\.manualBottom).deferredWrites(), supportsOpacity: false)
+                } else {
+                    ColorPicker("Color", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+                }
             }
+            .fixedSize()
+            .help("Manual shows these colors instead of Art-Net.")
         }
-        .fixedSize()
-        .padding(.leading, 8)
-        .help("Manual shows these colors instead of Art-Net. Gradient modes use a top and a bottom color.")
     }
 
     /// Big and colored so it reads from across the room: green Play while

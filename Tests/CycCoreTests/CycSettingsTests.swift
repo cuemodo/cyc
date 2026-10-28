@@ -22,6 +22,7 @@ final class CycSettingsTests: XCTestCase {
         settings.universe = 3
         settings.fixture = Fixture(address: 101, mode: .dimGradient)
         settings.source = .manual
+        settings.manualGradient = true
         settings.manualTop = RGB(red: 0, green: 0.5, blue: 1)
         settings.manualBottom = RGB(red: 1, green: 0, blue: 0)
         settings.displayID = 42
@@ -73,5 +74,10 @@ final class CycSettingsTests: XCTestCase {
             """#)
         XCTAssertEqual(settings.source, .manual)
         XCTAssertEqual(settings.manualTop, RGB(red: 0, green: 1, blue: 0))
+    }
+
+    func testReadsGridFromOlderFiles() throws {
+        let settings = try decode(#"{"format": "cuemodo-cyc-settings", "version": 1, "source": "grid"}"#)
+        XCTAssertEqual(settings.source, .testPattern)
     }
 }

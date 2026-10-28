@@ -30,4 +30,4 @@ run and see. Steps 1 to 9 make a show-ready first version; the rest is polish.
 | 12 | **Edge blend.** Soft fade across quad edges, adjustable width and curve | |
 | 13 | **Fixture profiles.** Hog, QLab and Cuemodo fixture definitions; short user guide | |
 | 14 | **Signing.** Wrap into a .app, Developer ID signing and notarization | |
-| 15 | **Gradient angle.** One more channel rotates the gradient (Gradient + Angle 7ch, Dim + Gradient + Angle 9ch) | |
+| 15 | **Gradient angle.** One more channel rotates the gradient (Gradient RGB + Angle 7ch, Gradient DRGB + Angle 9ch) | |

@@ -42,9 +42,9 @@ changes.
 | Mode | Channels | Meaning |
 | --- | --- | --- |
 | RGB | 3 | Red, green, blue for the whole canvas |
-| Dim + RGB | 4 | Intensity first (scales the color), then RGB |
-| Gradient | 6 | Top R, G, B, then bottom R, G, B |
-| Dim + Gradient | 8 | Top dimmer + RGB, then bottom dimmer + RGB |
+| DRGB | 4 | Dimmer (intensity) first (scales the color), then RGB |
+| Gradient RGB | 6 | Top R, G, B, then bottom R, G, B |
+| Gradient DRGB | 8 | Top dimmer + RGB, then bottom dimmer + RGB |
 
 Gradient modes are simply two RGB (or dimmer + RGB) blocks in a row, so on the desk they patch as
 two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom profile needed.
@@ -88,7 +88,7 @@ size. Edit > Undo (Cmd-Z) undoes each change, and every change saves itself.
 A room with four walls of different sizes is four quads: each wall's source patch can have its own
 size and height on the canvas, so the gradient lines up the way you want across walls.
 
-To line up on the wall, set the output to **Grid**: the quads show a white test grid drawn on the
+To line up on the wall, set the output to **Test Pattern**: the quads show a white test grid drawn on the
 canvas (a line every 100 canvas pixels, a thicker one every 500). When the mapping is right, the
 lines run straight across the seam between projectors. Moves that would dent a quad or cross its
 edges are refused.

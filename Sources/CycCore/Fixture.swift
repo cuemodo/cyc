@@ -11,9 +11,9 @@ public enum FixtureMode: String, CaseIterable, Identifiable, Codable, Sendable {
     public var name: String {
         switch self {
         case .rgb: "RGB (3 ch)"
-        case .dimRGB: "Dim + RGB (4 ch)"
-        case .gradient: "Gradient (6 ch)"
-        case .dimGradient: "Dim + Gradient (8 ch)"
+        case .dimRGB: "DRGB (4 ch)"
+        case .gradient: "Gradient RGB (6 ch)"
+        case .dimGradient: "Gradient DRGB (8 ch)"
         }
     }
 

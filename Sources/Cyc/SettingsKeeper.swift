@@ -24,6 +24,7 @@ final class SettingsKeeper {
             output.$source.map { _ in () }.eraseToAnyPublisher(),
             output.$manualTop.map { _ in () }.eraseToAnyPublisher(),
             output.$manualBottom.map { _ in () }.eraseToAnyPublisher(),
+            output.$manualGradient.map { _ in () }.eraseToAnyPublisher(),
             output.$selectedDisplayID.map { _ in () }.eraseToAnyPublisher(),
             output.$mapping.map { _ in () }.eraseToAnyPublisher())
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
@@ -57,6 +58,7 @@ final class SettingsKeeper {
         output.source = settings.source
         output.manualTop = settings.manualTop
         output.manualBottom = settings.manualBottom
+        output.manualGradient = settings.manualGradient
         output.selectDisplay(id: settings.displayID, name: settings.displayName)
         output.mapping = settings.mapping
     }
@@ -68,6 +70,7 @@ final class SettingsKeeper {
         settings.source = output.source
         settings.manualTop = output.manualTop
         settings.manualBottom = output.manualBottom
+        settings.manualGradient = output.manualGradient
         settings.displayID = output.selectedDisplayID
         settings.displayName = output.displays.first { $0.id == output.selectedDisplayID }?.name
         settings.mapping = output.mapping
