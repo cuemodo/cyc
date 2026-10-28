@@ -24,13 +24,35 @@ struct CycApp: App {
             SettingsView()
                 .environmentObject(output)
                 .environmentObject(input)
+                .cuemodoWindow()
         }
         .windowResizability(.contentSize)
+        .commands {
+            // Built with SwiftPM there is no Info.plist, so the standard About
+            // panel would show no version: give it ours.
+            CommandGroup(replacing: .appInfo) {
+                Button("About \(CycInfo.name)") {
+                    NSApp.orderFrontStandardAboutPanel(options: [
+                        .applicationName: CycInfo.name,
+                        .applicationVersion: CycInfo.version,
+                        .version: "",
+                    ])
+                }
+            }
+        }
 
         Window("Mapping", id: "mapping") {
             MappingWindowView()
                 .environmentObject(output)
+                .cuemodoWindow()
         }
+    }
+}
+
+extension NSImage {
+    /// A PNG from Sources/Cyc/Resources.
+    static func resource(_ name: String) -> NSImage? {
+        Bundle.module.url(forResource: name, withExtension: "png").flatMap(NSImage.init(contentsOf:))
     }
 }
 
@@ -39,6 +61,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // `swift run` starts us as a plain command-line process. Ask macOS to
         // treat it as a normal app, with a Dock icon and a focused window.
         NSApp.setActivationPolicy(.regular)
+        // No .app bundle yet, so set the Dock icon by hand.
+        NSApp.applicationIconImage = NSImage.resource("AppIcon")
         NSApp.activate()
     }
 

@@ -47,7 +47,7 @@ struct MappingWindowView: View {
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Canvas size (pixels)")
-                .font(.headline)
+                .sectionTitle()
             HStack {
                 TextField("Width", value: canvasSize(\.canvasWidth).deferredWrites(), format: .number)
                 Text("x")
@@ -58,7 +58,7 @@ struct MappingWindowView: View {
                 .foregroundStyle(.secondary)
             Divider()
             Text("Quads")
-                .font(.headline)
+                .sectionTitle()
             List(selection: $selectedQuad) {
                 ForEach(output.mapping.quads.indices, id: \.self) { index in
                     Text("Quad \(index + 1)").tag(index)

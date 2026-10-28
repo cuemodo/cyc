@@ -8,7 +8,7 @@ struct FixtureView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Fixture")
-                .font(.headline)
+                .sectionTitle()
             Picker("Mode", selection: $output.fixture.mode.deferredWrites()) {
                 ForEach(FixtureMode.allCases) { mode in
                     Text(mode.name).tag(mode)

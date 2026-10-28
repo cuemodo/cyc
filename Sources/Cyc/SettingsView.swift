@@ -10,11 +10,17 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(CycInfo.name)
-                .font(.title)
-            HStack {
-                Text("Version \(CycInfo.version)")
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 10) {
+                if let mark = NSImage.resource("CuemodoMark") {
+                    Image(nsImage: mark)
+                        .resizable()
+                        .interpolation(.high)
+                        .frame(width: 44, height: 44)
+                }
+                // A wordmark, so all lowercase like the "cuemodo" logo. The
+                // app's name stays "Cuemodo Cyc" everywhere else.
+                Text(CycInfo.name.lowercased())
+                    .brandTitle()
                 Spacer()
                 Button("Show Settings File") {
                     NSWorkspace.shared.activateFileViewerSelecting([SettingsFile.defaultURL])
@@ -23,49 +29,49 @@ struct SettingsView: View {
             Divider()
 
             Text("Output")
-                .font(.headline)
-            Picker("Output display", selection: $output.selectedDisplayID.deferredWrites()) {
-                ForEach(output.displays) { display in
-                    Text(display.label).tag(Optional(display.id))
-                }
-            }
-            .disabled(output.isOpen)
-
-            Picker("Show", selection: $output.source.deferredWrites()) {
-                ForEach(OutputSource.allCases) { source in
-                    Text(source.name).tag(source)
-                }
-            }
-            .pickerStyle(.segmented)
-            .fixedSize()
-            .help("Grid draws a white test grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
-
-            if output.source == .manual {
-                HStack(spacing: 16) {
-                    if output.fixture.mode.isGradient {
-                        ColorPicker("Top", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
-                        ColorPicker("Bottom", selection: color(\.manualBottom).deferredWrites(), supportsOpacity: false)
-                    } else {
-                        ColorPicker("Color", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+                .sectionTitle()
+            HStack(alignment: .center, spacing: 16) {
+                outputButton
+                // A grid, so both pickers start at the same left edge
+                // whatever the length of their labels.
+                Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 10) {
+                    GridRow {
+                        Text("Display")
+                            .gridColumnAlignment(.trailing)
+                        HStack {
+                            Picker("Display", selection: $output.selectedDisplayID.deferredWrites()) {
+                                ForEach(output.displays) { display in
+                                    Text(display.label).tag(Optional(display.id))
+                                }
+                            }
+                            .labelsHidden()
+                            .disabled(output.isOpen)
+                            Button("Mapping…") {
+                                openWindow(id: "mapping")
+                            }
+                            .help(mappingText)
+                        }
+                    }
+                    GridRow {
+                        Text("Show")
+                        // One cell, so the colors sit right after the picker.
+                        HStack(spacing: 0) {
+                            Picker("Show", selection: $output.source.deferredWrites()) {
+                                ForEach(OutputSource.allCases) { source in
+                                    Text(source.name).tag(source)
+                                }
+                            }
+                            .labelsHidden()
+                            .pickerStyle(.segmented)
+                            .fixedSize()
+                            .help("Grid draws a white test grid inside the quads: while adjusting the mapping, its lines must run straight across the seam.")
+                            if output.source == .manual {
+                                manualColors
+                            }
+                        }
                     }
                 }
-                .help("Manual shows these colors instead of Art-Net. Gradient modes use a top and a bottom color.")
             }
-
-            Button(output.isOpen ? "Close Output" : "Open Output") {
-                if output.isOpen {
-                    output.close()
-                } else {
-                    output.open()
-                }
-            }
-            .disabled(output.selectedDisplayID == nil)
-            .help("To close from the output itself, click it, then press Esc.")
-
-            Button("Mapping…") {
-                openWindow(id: "mapping")
-            }
-            .help(mappingText)
 
             if output.mapping.invalidQuadCount > 0 {
                 Text("\(output.mapping.invalidQuadCount) quads skipped (dented, crossed or squashed).")
@@ -81,6 +87,40 @@ struct SettingsView: View {
         }
         .padding(24)
         .frame(minWidth: 560, alignment: .leading)
+    }
+
+    private var manualColors: some View {
+        HStack(spacing: 12) {
+            if output.fixture.mode.isGradient {
+                ColorPicker("Top", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+                ColorPicker("Bottom", selection: color(\.manualBottom).deferredWrites(), supportsOpacity: false)
+            } else {
+                ColorPicker("Color", selection: color(\.manualTop).deferredWrites(), supportsOpacity: false)
+            }
+        }
+        .fixedSize()
+        .padding(.leading, 8)
+        .help("Manual shows these colors instead of Art-Net. Gradient modes use a top and a bottom color.")
+    }
+
+    /// Big and colored so it reads from across the room: green Play while
+    /// the output is closed, red Stop while it is live.
+    private var outputButton: some View {
+        Button {
+            if output.isOpen {
+                output.close()
+            } else {
+                output.open()
+            }
+        } label: {
+            Label(output.isOpen ? "Stop" : "Start",
+                  systemImage: output.isOpen ? "stop.fill" : "play.fill")
+        }
+        .buttonStyle(OutputButtonStyle(color: output.isOpen ? .red : .green))
+        .disabled(output.selectedDisplayID == nil)
+        .help(output.isOpen
+              ? "The output is live. Stop closes it (or click the output, then press Esc)."
+              : "Start opens the output fullscreen on the chosen display.")
     }
 
     private var mappingText: String {
@@ -102,5 +142,31 @@ struct SettingsView: View {
                     output[keyPath: keyPath] = new
                 }
             })
+    }
+}
+
+/// A large filled button with a white icon and title, dimmed when disabled.
+struct OutputButtonStyle: ButtonStyle {
+    let color: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        Face(configuration: configuration, color: color)
+    }
+
+    // Not "Body": that name is ButtonStyle's own associated type.
+    private struct Face: View {
+        let configuration: Configuration
+        let color: Color
+        @Environment(\.isEnabled) private var isEnabled
+
+        var body: some View {
+            configuration.label
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.white)
+                .frame(width: 130, height: 56)
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .fill(isEnabled ? color : Color.gray))
+                .opacity(configuration.isPressed ? 0.7 : 1)
+        }
     }
 }

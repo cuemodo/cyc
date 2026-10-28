@@ -9,7 +9,7 @@ struct DMXInputView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Art-Net input")
-                .font(.headline)
+                .sectionTitle()
             Stepper(value: $input.universe, in: 0...0x7FFF) {
                 Text("Universe \(input.universe)")
                 + Text("  (\(ArtDmxPacket.label(universe: UInt16(input.universe))))")
