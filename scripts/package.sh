@@ -15,7 +15,7 @@
 #
 # Notarization needs a stored keychain profile, created once per Apple ID (any app can reuse it) with:
 #   xcrun notarytool store-credentials notary \
-#       --apple-id <your Apple ID> --team-id KL8N8L33GU
+#       --apple-id <your Apple ID> --team-id <your Team ID>
 # (it asks for an app-specific password from account.apple.com).
 #
 # Environment overrides:
