@@ -111,15 +111,19 @@ accepted the build. If a step fails before the push, delete the local tag
    ```sh
    scripts/make-dmg.sh
    ```
-5. Push the tag:
+5. Push the tag. `git describe` reads the tag on the current commit (and fails if there is
+   none), so steps 5 and 6 need no typing of the version:
    ```sh
-   git push origin vX.Y.Z
+   tag=$(git describe --tags --exact-match)
+   git push origin "$tag"
    ```
-6. Create a draft release on GitHub, then edit the notes there and click **Publish**:
+6. Create a draft release named after the tag, with the DMG attached, then edit the notes on
+   GitHub and click **Publish**:
    ```sh
-   gh release create vX.Y.Z dist/Cuemodo-Cyc-X.Y.Z.dmg --verify-tag \
-     --title "Cuemodo Cyc X.Y.Z" --notes-from-tag --draft
+   gh release create "$tag" "dist/Cuemodo-Cyc-${tag#v}.dmg" --verify-tag \
+     --title "$tag" --notes-from-tag --draft
    ```
+   `${tag#v}` is the tag without its leading `v`, so `v0.1.0` gives `Cuemodo-Cyc-0.1.0.dmg`.
 
 Both scripts take `--no-notarize` to stop after signing, for a quick check of the app or the DMG
 window. Both read these environment variables:
