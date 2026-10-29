@@ -14,6 +14,8 @@ It is light enough to run next to QLab on the same Mac: it only draws when the c
 
 Part of the [Cuemodo](https://cuemodo.io) family of show-control tools. Early development.
 
+<img src="docs/images/main-window.png" alt="The Cuemodo Cyc main window: the Start button, the display picker, the Show choice (Art-Net, Manual, Test Pattern) and the Art-Net patch with universe, address, mode and signal loss" width="720">
+
 ## Requirements
 
 - A Mac with macOS 14 (Sonoma) or later, Apple silicon or Intel.
@@ -86,6 +88,8 @@ perfect rectangle, open **Mapping…** to draw quads (four-cornered shapes):
 - On the **Output** side, drag the corners to where that patch should land on the wall.
 - Everything outside the quads stays black, which hides light spilling off the wall and the
   doubled brightness where projectors overlap.
+
+<img src="docs/images/mapping-window.png" alt="The Mapping window: two quads splitting the canvas, each dragged on the output to fit its part of the wall, with the corner coordinates of the selected quad" width="895">
 
 Set **Show** to **Test Pattern** while mapping: the grid lines should run straight across the
 seam between projectors. Changes appear live on the output, save themselves, and can be undone
