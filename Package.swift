@@ -12,8 +12,13 @@ let package = Package(
         // fixture modes, mapping math, settings.
         .target(name: "CycCore"),
         // The macOS app itself: windows, Metal drawing, settings UI. The
-        // logo images come from the Cuemodo brand kit.
-        .executableTarget(name: "Cyc", dependencies: ["CycCore"], resources: [.process("Resources")]),
+        // logo images come from the Cuemodo brand kit. The shader file is
+        // compiled into default.metallib (needs the Metal Toolchain).
+        .executableTarget(
+            name: "Cyc",
+            dependencies: ["CycCore"],
+            resources: [.process("Resources"), .process("Shaders/Cyc.metal")]
+        ),
         .testTarget(name: "CycCoreTests", dependencies: ["CycCore"]),
     ]
 )

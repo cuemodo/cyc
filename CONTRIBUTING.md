@@ -6,7 +6,14 @@ and see the [README](README.md).
 
 ## Build and run
 
-Needs macOS 14 or later and Xcode (for the Swift toolchain).
+Needs macOS 14 or later, Xcode 26 or later (for the Swift toolchain) and Apple's Metal Toolchain,
+which compiles the shaders. Xcode downloads the Metal Toolchain separately; install it once with:
+
+```sh
+xcodebuild -downloadComponent MetalToolchain
+```
+
+Without it, `swift build` stops with "missing Metal Toolchain".
 
 ```sh
 swift build
@@ -23,6 +30,7 @@ app), not Cuemodo Cyc.
 
 - `Sources/CycCore/`: logic that needs no screen (DMX, fixture modes, mapping math), unit tested
 - `Sources/Cyc/`: the macOS app (windows, Metal drawing, main window UI)
+- `Sources/Cyc/Shaders/Cyc.metal`: the GPU shaders, compiled at build time
 - `Tests/CycCoreTests/`: XCTest tests for CycCore
 - `scripts/package.sh`: wraps the build into a signed, notarized .app
 - `scripts/make-dmg.sh`: puts that app into a signed, notarized DMG

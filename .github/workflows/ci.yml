@@ -6,9 +6,12 @@ on:
 
 jobs:
   test:
-    runs-on: macos-15
+    # Xcode 26 or later: its `swift build` compiles the Metal shaders.
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      - name: Install Metal Toolchain
+        run: xcodebuild -downloadComponent MetalToolchain
       - name: Build
         run: swift build
       - name: Test

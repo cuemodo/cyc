@@ -5,7 +5,7 @@ import MetalKit
 ///
 /// The image is the fixture's look (a solid color or a top-to-bottom gradient)
 /// painted on the canvas, then drawn through the mapping's quads; everything
-/// outside the quads stays black. The shader in `Shaders.swift` computes each
+/// outside the quads stays black. The shader in `Shaders/Cyc.metal` computes each
 /// pixel. The view is paused, so it draws only when `look` or `mapping` changes
 /// (`needsDisplay`), not 60 times a second. An unchanging look then costs next
 /// to nothing while QLab runs.
@@ -14,13 +14,13 @@ final class Renderer: NSObject, MTKViewDelegate {
     private let commandQueue: MTLCommandQueue
     private let pipeline: MTLRenderPipelineState
 
-    /// The look as the shader receives it. Must match `Look` in Shaders.swift.
+    /// The look as the shader receives it. Must match `Look` in Cyc.metal.
     private struct LookUniform {
         var top: SIMD4<Float>
         var bottom: SIMD4<Float>
     }
 
-    /// One quad as the shaders receive it. Must match `QuadInfo` in Shaders.swift.
+    /// One quad as the shaders receive it. Must match `QuadInfo` in Cyc.metal.
     private struct QuadUniform {
         var outputToCanvas: simd_float3x3
         var outputSize: SIMD2<Float>
@@ -28,7 +28,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         var grid: Float
     }
 
-    /// Fails (returns nil) if the Mac has no Metal GPU or the shader does not compile.
+    /// Fails (returns nil) if the Mac has no Metal GPU or the compiled shaders are missing.
     init?(frame: CGRect) {
         guard let device = MTLCreateSystemDefaultDevice(),
               let queue = device.makeCommandQueue() else { return nil }
@@ -107,7 +107,8 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     private static func makePipeline(device: MTLDevice, pixelFormat: MTLPixelFormat) throws -> MTLRenderPipelineState {
-        let library = try device.makeLibrary(source: Shaders.source, options: nil)
+        // `default.metallib`, compiled from Cyc.metal by `swift build`.
+        let library = try device.makeDefaultLibrary(bundle: .module)
         let descriptor = MTLRenderPipelineDescriptor()
         descriptor.vertexFunction = library.makeFunction(name: "quadVertex")
         descriptor.fragmentFunction = library.makeFunction(name: "mappedLook")
