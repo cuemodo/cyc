@@ -20,7 +20,9 @@ Part of the [Cuemodo](https://cuemodo.io) family of show-control tools. Early de
 
 - A Mac with macOS 14 (Sonoma) or later, Apple silicon or Intel.
 - A lighting desk or app that sends **Art-Net**, on the same network as the Mac (for example a
-  Hog 4, or a DMX desk through an Art-Net node).
+  Hog 4, or a DMX desk through an Art-Net node). USB DMX interfaces (such as an Enttec DMX USB
+  Pro) are not supported; with a desk that only has DMX cable outputs, put an Art-Net node between
+  the desk and the network.
 - The projectors connected to the Mac as a display. Two projectors side by side through a
   splitter (such as a Matrox) count as one wide display.
 
