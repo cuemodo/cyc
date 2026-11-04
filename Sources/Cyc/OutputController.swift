@@ -41,7 +41,7 @@ final class OutputController: ObservableObject {
     }
     @Published var signalLoss = SignalLoss.hold
     @Published var signalLossTimeout = 5.0
-    /// Show lock: the windows ignore clicks, and Esc no longer closes the output.
+    /// Show lock: the windows ignore clicks, and Cmd-U / Cmd-T do nothing.
     @Published var isLocked = false
     /// True after `signalLossTimeout` seconds without Art-Net.
     @Published private(set) var signalLost = false
@@ -58,6 +58,7 @@ final class OutputController: ObservableObject {
     private var renderer: Renderer?
     private var keepAwake: NSObjectProtocol?
     private var signalTimer: Timer?
+    private let exitReminder = ExitReminder()
 
     init(input: DMXInputController) {
         self.input = input
@@ -115,10 +116,15 @@ final class OutputController: ObservableObject {
         }
     }
 
+    /// The display chosen in the main window, if it is connected.
+    var selectedDisplay: Display? {
+        displays.first { $0.id == selectedDisplayID }
+    }
+
     /// The output size in real pixels: the chosen display's, even while the
     /// output is closed (3840 x 1200 if no display is chosen).
     var outputPixelSize: CGSize {
-        displays.first { $0.id == selectedDisplayID }?.pixelSize ?? CGSize(width: 3840, height: 1200)
+        selectedDisplay?.pixelSize ?? CGSize(width: 3840, height: 1200)
     }
 
     /// Changes the mapping as one undoable step (Edit > Undo, Cmd-Z).
@@ -145,6 +151,23 @@ final class OutputController: ObservableObject {
     }
 
 
+    /// Start (the button or Cmd-U). If the output is about to cover the screen
+    /// the controls are on, a reminder first says Cmd-T is the way back.
+    func start() {
+        guard !isOpen, !isLocked, !exitReminder.isShowing, let display = selectedDisplay else { return }
+        if displays.count == 1 || display.id == NSScreen.main?.displayID {
+            exitReminder.show { [weak self] in self?.open() }
+        } else {
+            open()
+        }
+    }
+
+    /// Stop (the button or Cmd-T). Ignored while the show is locked.
+    func stop() {
+        guard !isLocked else { return }
+        close()
+    }
+
     func open() {
         guard !isOpen,
               let screen = NSScreen.screens.first(where: { $0.displayID == selectedDisplayID }),
@@ -152,10 +175,6 @@ final class OutputController: ObservableObject {
         let window = OutputWindow(screen: screen)
         window.contentView = renderer.view
         window.hideCursor(over: renderer.view)
-        window.onEscape = { [weak self] in
-            guard let self, !self.isLocked else { return }
-            self.close()
-        }
         renderer.look = currentLook
         renderer.showsGrid = source == .testPattern
         renderer.mapping = mapping

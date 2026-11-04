@@ -8,8 +8,9 @@ struct CornerSelection: Equatable {
 }
 
 /// The Mapping window: every quad shown twice, on the canvas (what the fixture
-/// paints) and on the output (what the projectors show). Drag corners on either
-/// side; it works with the output closed. Cmd-Z undoes.
+/// paints) and on the output (what the projectors show). Drag corners, or drag
+/// inside a quad to move it whole, on either side; it works with the output
+/// closed. Cmd-Z undoes.
 struct MappingWindowView: View {
     @EnvironmentObject private var output: OutputController
     @Environment(\.undoManager) private var undoManager
@@ -68,12 +69,25 @@ struct MappingWindowView: View {
             Text("The gradient runs from the top of the canvas to its bottom.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Text("Output size (pixels)")
+                .sectionTitle()
+                .padding(.top, 4)
+            Text("\(Int(output.outputPixelSize.width)) x \(Int(output.outputPixelSize.height))")
+                .monospacedDigit()
+            Text(outputSizeSource)
+                .font(.caption)
+                .foregroundStyle(.secondary)
             Divider()
             Text("Quads")
                 .sectionTitle()
             List(selection: $selectedQuad) {
                 ForEach(output.mapping.quads.indices, id: \.self) { index in
-                    Text("Quad \(index + 1)").tag(index)
+                    HStack {
+                        Text("Quad \(index + 1)")
+                        Spacer()
+                        visibilityToggle(index)
+                    }
+                    .tag(index)
                 }
             }
             .frame(minHeight: 120)
@@ -102,6 +116,32 @@ struct MappingWindowView: View {
         }
     }
 
+    /// Where the output size comes from: the display picked in the main window.
+    private var outputSizeSource: String {
+        if let display = output.selectedDisplay {
+            return "From the display \(display.name), chosen in the main window."
+        }
+        return "No display chosen in the main window; using 3840 x 1200."
+    }
+
+    /// The eye button of one quad: hides it on the output and in the previews.
+    private func visibilityToggle(_ index: Int) -> some View {
+        let isHidden = output.mapping.quads[index].isHidden
+        return Button {
+            // Arrow keys must not nudge a corner nobody can see.
+            if !isHidden, selectedCorner?.id.quad == index {
+                selectedCorner = nil
+            }
+            output.setMapping(output.mapping.settingHidden(!isHidden, quad: index),
+                              undoManager: undoManager, actionName: isHidden ? "Show Quad" : "Hide Quad")
+        } label: {
+            Image(systemName: isHidden ? "eye.slash" : "eye")
+                .foregroundStyle(isHidden ? .secondary : .primary)
+        }
+        .buttonStyle(.borderless)
+        .help(isHidden ? "Show this quad again." : "Hide this quad on the output and in the previews, to line up the others.")
+    }
+
     private func canvasSize(_ keyPath: WritableKeyPath<Mapping, Double>) -> Binding<Double> {
         Binding(
             get: { output.mapping[keyPath: keyPath] },
@@ -114,8 +154,12 @@ struct MappingWindowView: View {
     }
 }
 
-/// One side of the mapping (canvas or output), scaled to fit, with every quad
-/// outlined and draggable corner handles. The selected quad is orange.
+/// One side of the mapping (canvas or output), scaled to fit, with every shown
+/// quad outlined and draggable corner handles. The selected quad is orange.
+/// Drag a corner to move it, or drag inside a quad (or its numbered center
+/// handle, for quads too small to click inside) to move the whole quad.
+/// A shaded margin around the canvas or output, past a dashed edge line, keeps
+/// corners that hang over its edge visible and grabbable.
 ///
 /// Click a corner to select it (white ring), then the arrow keys nudge it
 /// 1 pixel (10 with Shift), and Tab / Shift-Tab selects the next / previous
@@ -131,6 +175,7 @@ struct QuadSideEditor: View {
     @Environment(\.undoManager) private var undoManager
     @State private var mappingBeforeDrag: Mapping?
     @State private var draggedCorner: CornerID?
+    @State private var draggedQuad: Int?
     @FocusState private var hasKeyboard: Bool
 
     /// The selected corner, if it was picked on this side.
@@ -142,15 +187,40 @@ struct QuadSideEditor: View {
         selectedCorner = id.map { CornerSelection(id: $0, side: side) }
     }
 
+    /// Room around the canvas or output, in screen points, for corners that
+    /// hang over its edge.
+    private static let margin: Double = 24
+
+    /// How close, in screen points, a press must be to grab a corner or a
+    /// quad's center handle.
+    private static let cornerReach: Double = 10
+    private static let centerReach: Double = 10
+
+    /// Where a pixel of this side lands in the view, and back.
+    private struct Placement {
+        var scale: Double
+        func view(_ point: PixelPoint) -> CGPoint {
+            CGPoint(x: QuadSideEditor.margin + point.x * scale, y: QuadSideEditor.margin + point.y * scale)
+        }
+        func pixel(_ point: CGPoint) -> PixelPoint {
+            PixelPoint(x: (point.x - QuadSideEditor.margin) / scale, y: (point.y - QuadSideEditor.margin) / scale)
+        }
+    }
+
     var body: some View {
         GeometryReader { geometry in
-            let scale = geometry.size.width / width
-            Canvas { context, _ in
-                draw(in: &context, scale: scale)
+            let placement = Placement(scale: geometry.size.width / width)
+            // The canvas reaches into the margin around the fitted frame. The
+            // gesture goes on the canvas itself, so its locations use the
+            // canvas's coordinates, margin included.
+            Canvas { context, size in
+                draw(in: &context, size: size, placement: placement)
             }
-            .gesture(drag(scale: scale))
+            .gesture(drag(placement: placement))
+            .padding(-Self.margin)
         }
         .aspectRatio(CGSize(width: width, height: height), contentMode: .fit)
+        .padding(Self.margin)
         .focusable()
         .focused($hasKeyboard)
         .focusEffectDisabled()
@@ -169,7 +239,8 @@ struct QuadSideEditor: View {
             let backwards = shift || press.key == KeyEquivalent("\u{19}")
             // With no corner picked yet, start on the selected quad.
             var next = output.mapping.cornerAfter(selectedHere, backwards: backwards)
-            if selectedHere == nil, let quad = selectedQuad {
+            if selectedHere == nil, let quad = selectedQuad,
+               output.mapping.quads.indices.contains(quad), !output.mapping.quads[quad].isHidden {
                 next = CornerID(quad: quad, corner: .topLeft)
             }
             // Use `next` directly: reading the binding back right after
@@ -187,20 +258,23 @@ struct QuadSideEditor: View {
 
     private func nudge(dx: Double, dy: Double) {
         guard let id = selectedHere, let corner = output.mapping.corner(id, on: side) else { return }
-        let point = PixelPoint(
-            x: min(max(corner.x + dx, 0), width),
-            y: min(max(corner.y + dy, 0), height))
+        let point = PixelPoint(x: corner.x + dx, y: corner.y + dy)
         if let moved = output.mapping.moving(id, to: point, on: side) {
             output.setMapping(moved, undoManager: undoManager, actionName: "Nudge Corner")
         }
     }
 
-    private func draw(in context: inout GraphicsContext, scale: Double) {
-        context.fill(Path(CGRect(x: 0, y: 0, width: width * scale, height: height * scale)),
-                     with: .color(Color(white: 0.12)))
-        for (index, mappedQuad) in output.mapping.quads.enumerated() {
+    private func draw(in context: inout GraphicsContext, size: CGSize, placement: Placement) {
+        // The margin: off the canvas or output, still in reach.
+        context.fill(Path(roundedRect: CGRect(origin: .zero, size: size), cornerRadius: 6),
+                     with: .color(Color.gray.opacity(0.15)))
+        let origin = placement.view(PixelPoint(x: 0, y: 0))
+        let edge = CGRect(x: origin.x, y: origin.y, width: width * placement.scale, height: height * placement.scale)
+        context.fill(Path(edge), with: .color(Color(white: 0.12)))
+        context.stroke(Path(edge), with: .color(.white.opacity(0.6)), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+        for (index, mappedQuad) in output.mapping.quads.enumerated() where !mappedQuad.isHidden {
             let quad = mappedQuad[side: side]
-            let points = quad.corners.map { CGPoint(x: $0.x * scale, y: $0.y * scale) }
+            let points = quad.corners.map(placement.view)
             var outline = Path()
             outline.addLines(points)
             outline.closeSubpath()
@@ -208,7 +282,11 @@ struct QuadSideEditor: View {
             context.fill(outline, with: .color(color.opacity(0.12)))
             context.stroke(outline, with: .color(quad.isConvex ? color : .red), lineWidth: index == selectedQuad ? 2 : 1)
 
-            let center = CGPoint(x: points.map(\.x).reduce(0, +) / 4, y: points.map(\.y).reduce(0, +) / 4)
+            // The center handle, ringed so it reads as something to grab.
+            let center = placement.view(quad.center)
+            let reach = Self.centerReach
+            context.stroke(Path(ellipseIn: CGRect(x: center.x - reach, y: center.y - reach, width: 2 * reach, height: 2 * reach)),
+                           with: .color(color.opacity(0.6)), lineWidth: 1)
             context.draw(Text("\(index + 1)").font(.headline).foregroundColor(color), at: center)
             for (corner, point) in zip(Corner.allCases, points) {
                 context.fill(Path(ellipseIn: CGRect(x: point.x - 4, y: point.y - 4, width: 8, height: 8)),
@@ -221,25 +299,36 @@ struct QuadSideEditor: View {
         }
     }
 
-    private func drag(scale: Double) -> some Gesture {
+    private func drag(placement: Placement) -> some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 if mappingBeforeDrag == nil {
-                    // Drag just started: grab the corner under the pointer, or
-                    // select the quad that was clicked.
+                    // Drag just started: grab the corner or quad under the
+                    // pointer, which also selects it.
                     mappingBeforeDrag = output.mapping
-                    let start = PixelPoint(x: value.startLocation.x / scale, y: value.startLocation.y / scale)
-                    draggedCorner = output.mapping.nearestCorner(to: start, within: 10 / scale, on: side)
+                    let handle = output.mapping.handle(at: placement.pixel(value.startLocation),
+                                                       cornerReach: Self.cornerReach / placement.scale,
+                                                       centerReach: Self.centerReach / placement.scale, on: side)
+                    switch handle {
+                    case .corner(let id): (draggedCorner, draggedQuad) = (id, nil)
+                    case .quad(let index): (draggedCorner, draggedQuad) = (nil, index)
+                    case nil: (draggedCorner, draggedQuad) = (nil, nil)
+                    }
                     select(draggedCorner)
-                    selectedQuad = draggedCorner?.quad ?? output.mapping.quadIndex(at: start, on: side)
+                    selectedQuad = draggedCorner?.quad ?? draggedQuad
                     hasKeyboard = true
                 }
-                guard let corner = draggedCorner else { return }
-                let point = PixelPoint(
-                    x: min(max((value.location.x / scale).rounded(), 0), width),
-                    y: min(max((value.location.y / scale).rounded(), 0), height))
-                if let moved = output.mapping.moving(corner, to: point, on: side) {
-                    output.mapping = moved  // live while dragging
+                if let corner = draggedCorner {
+                    let pointer = placement.pixel(value.location)
+                    let point = PixelPoint(x: pointer.x.rounded(), y: pointer.y.rounded())
+                    if let moved = output.mapping.moving(corner, to: point, on: side) {
+                        output.mapping = moved  // live while dragging
+                    }
+                } else if let quad = draggedQuad, let before = mappingBeforeDrag {
+                    // Shift from where the drag started, so rounding never adds up.
+                    let dx = (value.translation.width / placement.scale).rounded()
+                    let dy = (value.translation.height / placement.scale).rounded()
+                    output.mapping = before.movingQuad(quad, dx: dx, dy: dy, on: side)
                 }
             }
             .onEnded { _ in
@@ -247,10 +336,12 @@ struct QuadSideEditor: View {
                 if let before = mappingBeforeDrag {
                     let after = output.mapping
                     output.mapping = before
-                    output.setMapping(after, undoManager: undoManager, actionName: "Move Corner")
+                    output.setMapping(after, undoManager: undoManager,
+                                      actionName: draggedQuad == nil ? "Move Corner" : "Move Quad")
                 }
                 mappingBeforeDrag = nil
                 draggedCorner = nil
+                draggedQuad = nil
             }
     }
 }
@@ -344,7 +435,7 @@ struct QuadCoordinatesView: View {
     private func bump(_ field: Field, by delta: Double) {
         let id = CornerID(quad: quadIndex, corner: field.corner)
         guard var point = output.mapping.corner(id, on: field.side) else { return }
-        point[keyPath: keyPath(field.axis)] = max(point[keyPath: keyPath(field.axis)] + delta, 0)
+        point[keyPath: keyPath(field.axis)] += delta
         if let moved = output.mapping.moving(id, to: point, on: field.side) {
             output.setMapping(moved, undoManager: undoManager, actionName: "Nudge Corner")
         }

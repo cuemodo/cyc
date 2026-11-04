@@ -67,7 +67,10 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 ## Rendering
 
 - One borderless window covers the output display, above its menu bar. It never takes keyboard
-  focus by itself, so QLab keeps its GO key; click it, then Esc, to close it.
+  focus by itself, so QLab keeps its GO key. Output > Start (Cmd-U) opens it, Output > Stop
+  (Cmd-T) closes it. If it is about to cover the screen the controls are on (one display), a small
+  window first reminds that Cmd-T is the way back; the output opens when it closes (OK, or
+  after 5 seconds).
 - The Metal view is paused and draws only when the color or the mapping changes.
 - No textures: the shader computes the color from the canvas position (solid, or a top-to-bottom
   blend). Each quad is two triangles at its destination corners; the homography maps each output
@@ -79,8 +82,13 @@ two ordinary 3- or 4-channel LED fixtures on consecutive addresses, no custom pr
 
 The **Mapping window** ("Mapping…" in the main window) works with the output open or closed.
 It shows every quad twice: on the canvas (the patch of the picture it takes) and on the output
-(where it lands). Drag corners on either side, or click a corner and nudge it with the arrow keys
-(Shift: 10 px, Tab for the next corner). Click a quad to select it: its corners are listed as
+(where it lands). Drag corners on either side, or drag inside a quad (or by its ringed number in the middle, handy for small quads) to move it
+whole, or click a
+corner and nudge it with the arrow keys (Shift: 10 px, Tab for the next corner). Corners may go past
+the edge of the canvas or the output (a shaded margin past a dashed edge line keeps them in reach): a quad can
+hang over the edge, and the part off the output is simply not shown. The eye button next to each
+quad hides it, on the output and in the previews, to line up the others; the main window says when
+quads are hidden. Click a quad to select it: its corners are listed as
 numbers (canvas and output) in the sidebar, boxed so you can see which corner is selected, and
 can be typed exactly or stepped with the up / down arrows. Add or remove quads, and set the canvas
 size. Edit > Undo (Cmd-Z) undoes each change, and every change saves itself.
@@ -115,7 +123,7 @@ to start from exact numbers.
 Quit Cyc, open the settings file (File > Show Settings File in Finder), edit the `mapping` block, and relaunch.
 All numbers are pixels. `source` corners are on the canvas, `destination` corners on the output
 (the Matrox output is 3840 x 1200: the left projector shows x 0 to 1920, the right one 1920 to
-3840). Corners go clockwise from top-left. With an empty `quads` list the canvas fills the output.
+3840). Corners go clockwise from top-left. A quad can also have `"isHidden" : true`. With an empty `quads` list the canvas fills the output.
 
 For a hard cut, split the canvas where the seam should be on the wall, give each projector the
 canvas patch it should light, and move its destination corners until the patch lands on the wall
@@ -162,8 +170,8 @@ many.
   the Mac), it is selected as soon as it shows up.
 - **Display drop-out.** If the projectors' display disappears while the output is open, the output
   reopens on it when it comes back.
-- **Lock.** The Lock button makes the main and Mapping windows ignore clicks and keys, and Esc on
-  the output does nothing. It stays locked after a relaunch.
+- **Lock.** The Lock button makes the main and Mapping windows ignore clicks and keys, and Cmd-U /
+  Cmd-T do nothing. It stays locked after a relaunch.
 - **Quit.** Cmd-Q asks first while the output is live.
 
 See [show-checklist.md](show-checklist.md) for the steps before a show, including the CPU/GPU check

@@ -54,8 +54,8 @@ struct MainView: View {
                             }
                         }
                         GridRow {
-                            Text("Show")
-                            Picker("Show", selection: $output.source.deferredWrites()) {
+                            Text("Source")
+                            Picker("Source", selection: $output.source.deferredWrites()) {
                                 ForEach(OutputSource.allCases) { source in
                                     Text(source.name).tag(source)
                                 }
@@ -72,6 +72,14 @@ struct MainView: View {
                     Text("\(output.mapping.invalidQuadCount) quads skipped (dented, crossed or squashed).")
                         .font(.caption)
                         .foregroundStyle(.red)
+                }
+                // A quad hidden while mapping and forgotten leaves a black patch.
+                let hiddenCount = output.mapping.quads.filter(\.isHidden).count
+                if hiddenCount > 0 {
+                    Label("\(hiddenCount) quads hidden in the Mapping window.",
+                          systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                 }
 
                 switch output.source {
@@ -129,7 +137,7 @@ struct MainView: View {
         .buttonStyle(.borderedProminent)
         .tint(output.isLocked ? Brand.amber : .gray)
         .help(output.isLocked
-              ? "Locked for the show: controls, the Mapping window and Esc on the output are ignored. Click to unlock."
+              ? "Locked for the show: controls, the Mapping window, Cmd-U and Cmd-T are ignored. Click to unlock."
               : "Lock everything for the show, so a stray click or key press changes nothing.")
     }
 
@@ -138,9 +146,9 @@ struct MainView: View {
     private var outputButton: some View {
         Button {
             if output.isOpen {
-                output.close()
+                output.stop()
             } else {
-                output.open()
+                output.start()
             }
         } label: {
             Label(output.isOpen ? "Stop" : "Start",
@@ -149,8 +157,8 @@ struct MainView: View {
         .buttonStyle(OutputButtonStyle(color: output.isOpen ? .red : .green))
         .disabled(output.selectedDisplayID == nil)
         .help(output.isOpen
-              ? "The output is live. Stop closes it (or click the output, then press Esc)."
-              : "Start opens the output fullscreen on the chosen display.")
+              ? "The output is live. Stop (Cmd-T) closes it."
+              : "Start (Cmd-U) opens the output fullscreen on the chosen display.")
     }
 
     private var mappingText: String {

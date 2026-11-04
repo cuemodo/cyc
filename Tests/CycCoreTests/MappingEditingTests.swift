@@ -84,3 +84,72 @@ final class MappingEditingTests: XCTestCase {
         XCTAssertEqual(three.removingQuad(at: 9), three)
     }
 }
+
+final class MappingQuadMoveAndHideTests: XCTestCase {
+    private let mapping = Mapping(quads: [
+        MappedQuad(source: Quad(x: 0, y: 0, width: 100, height: 100),
+                   destination: Quad(x: 0, y: 0, width: 100, height: 100)),
+        MappedQuad(source: Quad(x: 50, y: 50, width: 100, height: 100),
+                   destination: Quad(x: 50, y: 50, width: 100, height: 100)),
+    ])
+
+    func testMovingAWholeQuadKeepsItsShape() {
+        let moved = mapping.movingQuad(0, dx: -30, dy: 20, on: .source)
+        XCTAssertEqual(moved.quads[0].source, Quad(x: -30, y: 20, width: 100, height: 100))
+        XCTAssertEqual(moved.quads[0].destination, mapping.quads[0].destination)
+        XCTAssertEqual(moved.quads[1], mapping.quads[1])
+        XCTAssertEqual(mapping.movingQuad(5, dx: 1, dy: 1), mapping)
+    }
+
+    func testCornersMayLeaveTheOutput() throws {
+        let id = CornerID(quad: 0, corner: .topLeft)
+        let moved = try XCTUnwrap(mapping.moving(id, to: PixelPoint(x: -40, y: -25)))
+        XCTAssertEqual(moved.corner(id), PixelPoint(x: -40, y: -25))
+    }
+
+    func testHiddenQuadsAreNotDrawnOrPicked() {
+        let hidden = mapping.settingHidden(true, quad: 1)
+        XCTAssertTrue(hidden.quads[1].isHidden)
+        XCTAssertEqual(hidden.drawableQuads(outputWidth: 200, outputHeight: 200).quads.count, 1)
+        // Quad 1 is on top where they overlap, but hidden: quad 0 is picked.
+        XCTAssertEqual(hidden.quadIndex(at: PixelPoint(x: 75, y: 75)), 0)
+        XCTAssertNil(hidden.nearestCorner(to: PixelPoint(x: 150, y: 150), within: 5))
+        XCTAssertEqual(hidden.allCorners.count, 4)
+        XCTAssertEqual(hidden.cornerAfter(CornerID(quad: 0, corner: .bottomLeft)),
+                       CornerID(quad: 0, corner: .topLeft))
+
+        let allHidden = hidden.settingHidden(true, quad: 0)
+        XCTAssertTrue(allHidden.drawableQuads(outputWidth: 200, outputHeight: 200).quads.isEmpty)
+    }
+
+    func testHiddenIsOptionalInJSON() throws {
+        let json = """
+        {"source": {"topLeft": {"x": 0, "y": 0}, "topRight": {"x": 1, "y": 0},
+                    "bottomRight": {"x": 1, "y": 1}, "bottomLeft": {"x": 0, "y": 1}},
+         "destination": {"topLeft": {"x": 0, "y": 0}, "topRight": {"x": 1, "y": 0},
+                         "bottomRight": {"x": 1, "y": 1}, "bottomLeft": {"x": 0, "y": 1}}}
+        """
+        let quad = try JSONDecoder().decode(MappedQuad.self, from: Data(json.utf8))
+        XCTAssertFalse(quad.isHidden)
+
+        let hidden = MappedQuad(source: quad.source, destination: quad.destination, isHidden: true)
+        let roundTrip = try JSONDecoder().decode(MappedQuad.self, from: JSONEncoder().encode(hidden))
+        XCTAssertTrue(roundTrip.isHidden)
+    }
+
+    func testHandleUnderThePointer() {
+        let tiny = Mapping(quads: [MappedQuad(source: Quad(x: 0, y: 0, width: 10, height: 10),
+                                              destination: Quad(x: 0, y: 0, width: 10, height: 10))])
+        // Inside a tiny quad, every point is near a corner: the center still wins near the middle.
+        XCTAssertEqual(tiny.handle(at: PixelPoint(x: 5, y: 6), cornerReach: 10, centerReach: 6), .quad(0))
+        XCTAssertEqual(tiny.handle(at: PixelPoint(x: 9, y: 1), cornerReach: 10, centerReach: 6),
+                       .corner(CornerID(quad: 0, corner: .topRight)))
+        XCTAssertNil(tiny.handle(at: PixelPoint(x: 50, y: 50), cornerReach: 10, centerReach: 6))
+
+        // Far from any handle, a press inside a quad grabs it; hidden quads are skipped.
+        XCTAssertEqual(mapping.handle(at: PixelPoint(x: 30, y: 70), cornerReach: 5, centerReach: 5), .quad(0))
+        XCTAssertEqual(mapping.handle(at: PixelPoint(x: 75, y: 75), cornerReach: 5, centerReach: 5), .quad(1))
+        let hidden = mapping.settingHidden(true, quad: 1)
+        XCTAssertEqual(hidden.handle(at: PixelPoint(x: 75, y: 75), cornerReach: 5, centerReach: 5), .quad(0))
+    }
+}

@@ -1,12 +1,29 @@
 /// One quad of the mapping: a patch of the canvas (`source`) and where that
 /// patch lands on the output (`destination`), both in pixels.
+///
+/// A hidden quad stays in the mapping but is not drawn on the output or in the
+/// Mapping window, which helps while lining up the other quads.
 public struct MappedQuad: Equatable, Codable, Sendable {
     public var source: Quad
     public var destination: Quad
+    public var isHidden: Bool
 
-    public init(source: Quad, destination: Quad) {
+    public init(source: Quad, destination: Quad, isHidden: Bool = false) {
         self.source = source
         self.destination = destination
+        self.isHidden = isHidden
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case source, destination, isHidden
+    }
+
+    /// `isHidden` may be missing (older or hand-written files): the quad shows.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        source = try container.decode(Quad.self, forKey: .source)
+        destination = try container.decode(Quad.self, forKey: .destination)
+        isHidden = try container.decodeIfPresent(Bool.self, forKey: .isHidden) ?? false
     }
 }
 
@@ -36,13 +53,14 @@ public struct Mapping: Equatable, Sendable {
     /// Quads that can be drawn on an output of the given size, and the canvas
     /// height the gradient runs over. Quads with a dent, crossed edges or
     /// squashed corners are skipped, because they have no sensible mapping.
+    /// Hidden quads are skipped too, so hiding them all leaves the output black.
     public func drawableQuads(outputWidth: Double, outputHeight: Double) -> (quads: [DrawableQuad], canvasHeight: Double) {
         guard !quads.isEmpty else {
             let full = Quad(x: 0, y: 0, width: outputWidth, height: outputHeight)
             return ([DrawableQuad(destination: full, outputToCanvas: .identity)], outputHeight)
         }
         let drawable = quads.compactMap { quad -> DrawableQuad? in
-            guard quad.source.isConvex, quad.destination.isConvex,
+            guard !quad.isHidden, quad.source.isConvex, quad.destination.isConvex,
                   let homography = Homography(from: quad.destination, to: quad.source) else { return nil }
             return DrawableQuad(destination: quad.destination, outputToCanvas: homography)
         }

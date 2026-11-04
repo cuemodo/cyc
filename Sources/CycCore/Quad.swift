@@ -39,6 +39,11 @@ public struct Quad: Equatable, Codable, Sendable {
 
     public var corners: [PixelPoint] { [topLeft, topRight, bottomRight, bottomLeft] }
 
+    /// The average of the four corners: the middle of the quad.
+    public var center: PixelPoint {
+        PixelPoint(x: corners.map(\.x).reduce(0, +) / 4, y: corners.map(\.y).reduce(0, +) / 4)
+    }
+
     /// True when the quad has no dent and its edges do not cross (no "bow tie").
     /// Only such quads map sensibly; the mapping editor should refuse the others.
     ///

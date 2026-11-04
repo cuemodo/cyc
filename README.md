@@ -47,14 +47,16 @@ Firewall.
 1. **Output:** pick the projector display under **Display**.
 2. **Patch:** under **Art-Net Patch**, set the **Universe**, **Address** and **Mode** to match how
    the fixture is patched on your desk (see [Fixture modes](#fixture-modes)).
-3. **Start:** set **Show** to **Art-Net** and click the green **Start** button. The output opens
+3. **Start:** set **Source** to **Art-Net** and click the green **Start** button. The output opens
    full screen on the projectors.
 4. Bring up the fixture on the desk. **Show Levels** displays the 512 channels as they arrive, to
    check the desk is reaching the Mac.
 
-**Stop** (or click the output and press Esc) closes the output.
+**Stop** closes the output. Shortcuts: **Cmd-U** starts it, **Cmd-T** stops it (Output menu). When
+the output will cover the screen the controls are on (a Mac with one display), a reminder about
+Cmd-T shows for 5 seconds (or until OK) before it opens.
 
-The **Show** choice also offers:
+The **Source** choice also offers:
 
 - **Manual:** pick a solid color or a gradient in the app, without a desk. Handy for focusing.
 - **Test Pattern:** a grid, for lining up the mapping.
@@ -91,7 +93,7 @@ perfect rectangle, open **Mapping…** to draw quads (four-cornered shapes):
 
 <img src="docs/images/mapping-window.png" alt="The Mapping window: two quads splitting the canvas, each dragged on the output to fit its part of the wall, with the corner coordinates of the selected quad" width="895">
 
-Set **Show** to **Test Pattern** while mapping: the grid lines should run straight across the
+Set **Source** to **Test Pattern** while mapping: the grid lines should run straight across the
 seam between projectors. Changes appear live on the output, save themselves, and can be undone
 with Cmd-Z.
 
@@ -119,7 +121,7 @@ from defaults. **Show Settings File in Finder** shows where the working copy liv
   node (Art-Net often uses 2.x.x.x or 10.x.x.x addresses), the universe matches, and Local
   Network access is allowed (see [Install](#install)).
 - **Levels move but the wall doesn't change:** check the **Address** and **Mode** match the
-  desk's patch, and **Show** is set to **Art-Net**.
+  desk's patch, and **Source** is set to **Art-Net**.
 - **Wrong screen goes full screen:** pick the projector under **Display**, then Start again.
 
 ## Help and feedback

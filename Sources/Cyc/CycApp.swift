@@ -42,6 +42,7 @@ struct CycApp: App {
                 }
             }
             SettingsCommands(keeper: settingsKeeper, output: output)
+            OutputCommands(output: output)
             CommandGroup(replacing: .help) {
                 Button("Cuemodo Website") {
                     NSWorkspace.shared.open(CycInfo.website)

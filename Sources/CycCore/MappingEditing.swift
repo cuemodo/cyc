@@ -79,6 +79,12 @@ public struct CornerID: Hashable, Sendable {
     }
 }
 
+/// What a press in a mapping preview grabs: one corner, or a whole quad.
+public enum MappingHandle: Equatable, Sendable {
+    case corner(CornerID)
+    case quad(Int)
+}
+
 /// What the mapping editors do to quads and corners. `side` says whether a
 /// corner is on the canvas (`.source`) or on the output (`.destination`, the
 /// default). Kept here, away from the UI, so it can be tested.
@@ -95,9 +101,10 @@ extension Mapping {
         quads.indices.contains(id.quad) ? quads[id.quad][side: side][corner: id.corner] : nil
     }
 
-    /// Every corner, quad by quad, clockwise from top-left.
+    /// Every corner of the shown quads, quad by quad, clockwise from top-left.
+    /// Hidden quads are left out, so they can't be picked or tabbed to.
     public var allCorners: [CornerID] {
-        quads.indices.flatMap { quad in Corner.allCases.map { CornerID(quad: quad, corner: $0) } }
+        quads.indices.filter { !quads[$0].isHidden }.flatMap { quad in Corner.allCases.map { CornerID(quad: quad, corner: $0) } }
     }
 
     /// The corner closest to `point`, if one is within `maxDistance` pixels.
@@ -113,6 +120,30 @@ extension Mapping {
         return nearest
     }
 
+    /// What a press at `point` grabs. Corners (within `cornerReach`) and quad
+    /// centers (within `centerReach`) are handles, and the closest one wins, so
+    /// even a quad too small to click inside can be moved by its center.
+    /// Failing that, a press inside a quad grabs the quad.
+    public func handle(at point: PixelPoint, cornerReach: Double, centerReach: Double,
+                       on side: MappingSide = .destination) -> MappingHandle? {
+        func distance(_ a: PixelPoint) -> Double {
+            ((a.x - point.x) * (a.x - point.x) + (a.y - point.y) * (a.y - point.y)).squareRoot()
+        }
+        var best: (handle: MappingHandle, distance: Double)?
+        if let id = nearestCorner(to: point, within: cornerReach, on: side), let corner = corner(id, on: side) {
+            best = (.corner(id), distance(corner))
+        }
+        // Topmost quad first, as for corners.
+        for index in quads.indices.reversed() where !quads[index].isHidden {
+            let d = distance(quads[index][side: side].center)
+            if d <= centerReach, d < (best?.distance ?? .infinity) {
+                best = (.quad(index), d)
+            }
+        }
+        if let best { return best.handle }
+        return quadIndex(at: point, on: side).map { .quad($0) }
+    }
+
     /// The mapping with one corner moved, or nil when the move would dent the
     /// quad or cross its edges (the corner then stays put).
     public func moving(_ id: CornerID, to point: PixelPoint, on side: MappingSide = .destination) -> Mapping? {
@@ -122,9 +153,30 @@ extension Mapping {
         return moved.quads[id.quad][side: side].isConvex ? moved : nil
     }
 
-    /// The last (topmost) quad containing `point`, if any.
+    /// The mapping with all four corners of one quad shifted by `dx`, `dy`
+    /// pixels on one side, keeping its shape. Corners may leave the canvas or
+    /// the output: a quad can hang over the edge.
+    public func movingQuad(_ index: Int, dx: Double, dy: Double, on side: MappingSide = .destination) -> Mapping {
+        guard quads.indices.contains(index) else { return self }
+        var moved = self
+        for corner in Corner.allCases {
+            moved.quads[index][side: side][corner: corner].x += dx
+            moved.quads[index][side: side][corner: corner].y += dy
+        }
+        return moved
+    }
+
+    /// The last (topmost) shown quad containing `point`, if any.
     public func quadIndex(at point: PixelPoint, on side: MappingSide = .destination) -> Int? {
-        quads.indices.last { quads[$0][side: side].contains(point) }
+        quads.indices.last { !quads[$0].isHidden && quads[$0][side: side].contains(point) }
+    }
+
+    /// The mapping with one quad shown or hidden.
+    public func settingHidden(_ isHidden: Bool, quad index: Int) -> Mapping {
+        guard quads.indices.contains(index) else { return self }
+        var mapping = self
+        mapping.quads[index].isHidden = isHidden
+        return mapping
     }
 
     /// The mapping with one more quad: a rectangle half the size of the canvas

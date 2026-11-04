@@ -3,9 +3,8 @@ import AppKit
 /// A borderless window covering one whole display: the projector output.
 ///
 /// It never grabs keyboard focus by itself, so QLab keeps its GO key while
-/// the output is open. Click the output first if you want Esc to close it.
+/// the output is open. Cmd-T (Output menu) closes it.
 final class OutputWindow: NSWindow {
-    var onEscape: (@MainActor () -> Void)?
     private var cursorHidden = false
 
 
@@ -23,17 +22,9 @@ final class OutputWindow: NSWindow {
         fatalError("OutputWindow is created in code, not from a storyboard")
     }
 
-    // Borderless windows refuse focus by default; allow it so Esc works after a click.
+    // Borderless windows refuse focus by default; allow it so a click on the
+    // output brings Cuemodo Cyc forward and Cmd-T reaches its menu.
     override var canBecomeKey: Bool { true }
-
-    override func keyDown(with event: NSEvent) {
-        let escapeKeyCode: UInt16 = 53
-        if event.keyCode == escapeKeyCode {
-            onEscape?()
-        } else {
-            super.keyDown(with: event)
-        }
-    }
 
     /// Hide the mouse pointer while it is over the projector image.
     func hideCursor(over view: NSView) {
