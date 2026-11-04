@@ -95,6 +95,9 @@ certificate, so only maintainers can make one.
 The version (`X.Y.Z`) lives in `Sources/CycCore/CycInfo.swift`. The build number is the commit
 count, so it goes up by itself and never resets.
 
+While below 1.0, bump `Y` for new features or anything that changes how the operator works
+(shortcuts, saved settings, output behavior), and `Z` for fixes only.
+
 ### Making a release
 
 The tag is created first, so it names exactly what gets built, but pushed last, once Apple has
