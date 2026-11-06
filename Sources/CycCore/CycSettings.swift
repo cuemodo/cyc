@@ -69,9 +69,9 @@ public enum SettingsError: Error, Equatable, CustomStringConvertible {
     public var description: String {
         switch self {
         case .notCycSettings:
-            "This is not a Cuemodo Cyc settings file."
+            "This is not a Cyc settings file."
         case .newerVersion(let version):
-            "This settings file is version \(version), made by a newer Cuemodo Cyc."
+            "This settings file is version \(version), made by a newer Cyc."
         }
     }
 }
@@ -128,7 +128,7 @@ extension CycSettings: Codable {
 
 /// Reading and writing the settings file.
 public enum SettingsFile {
-    /// ~/Library/Application Support/Cuemodo Cyc/settings.json
+    /// ~/Library/Application Support/Cyc/settings.json
     public static var defaultURL: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(CycInfo.name, isDirectory: true)

@@ -1,20 +1,20 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/cuemodo-lockup-horizontal-on-dark.svg">
-  <img src="docs/images/cuemodo-lockup-horizontal-on-light.svg" alt="Cuemodo" width="400">
-</picture>
+<img src="docs/images/cyc-icon.png" alt="The Cyc app icon: a pink to violet projected wash with a warm light" width="128">
 
-# Cuemodo Cyc
+# Cyc
 
-Turn projectors into one DMX-controlled light. Cuemodo Cyc is a small macOS app that listens for
+by [Cuemodo](https://cuemodo.io)
+
+Turn projectors into one DMX-controlled light. Cyc is a small macOS app that listens for
 Art-Net, behaves like a single fixture (a solid RGB color, or a top-to-bottom gradient like a
 theatre cyc), and fills the projector output with that color. A simple quad mapper keeps the light
 inside the wash area and stops overlapping projectors from doubling up.
 
 It is light enough to run next to QLab on the same Mac: it only draws when the color changes.
 
-Part of the [Cuemodo](https://cuemodo.io) family of show-control tools. Early development.
+Part of the [Cuemodo](https://cuemodo.io) family of show-control tools. It works on its own with
+any desk or app that sends Art-Net, so you don't need the Cuemodo app. Early development.
 
-<img src="docs/images/main-window.png" alt="The Cuemodo Cyc main window: the Start button, the display picker, the Show choice (Art-Net, Manual, Test Pattern) and the Art-Net patch with universe, address, mode and signal loss" width="720">
+<img src="docs/images/main-window.png" alt="The Cyc main window: the Start button, the display picker, the Show choice (Art-Net, Manual, Test Pattern) and the Art-Net patch with universe, address, mode and signal loss" width="720">
 
 ## Requirements
 
@@ -28,10 +28,10 @@ Part of the [Cuemodo](https://cuemodo.io) family of show-control tools. Early de
 
 ## Install
 
-1. Download `Cuemodo-Cyc-X.Y.Z.dmg` from the
+1. Download `Cyc-X.Y.Z.dmg` from the
    [latest release](https://github.com/cuemodo/cyc/releases/latest).
-2. Open the DMG and drag **Cuemodo Cyc** onto **Applications**.
-3. Open Cuemodo Cyc from Applications. The app is signed and notarized by Apple, so it opens
+2. Open the DMG and drag **Cyc** onto **Applications**.
+3. Open Cyc from Applications. The app is signed and notarized by Apple, so it opens
    without a security warning.
 
 On first launch, macOS may ask:
@@ -65,7 +65,7 @@ The **Source** choice also offers:
 
 ## Fixture modes
 
-Patch Cuemodo Cyc on the desk as a generic LED fixture. Channels count from the address you set.
+Patch Cyc on the desk as a generic LED fixture. Channels count from the address you set.
 A dimmer channel (D) scales the color: at 50 % the color keeps its mix but gives half the light.
 
 | Mode | Channels | Layout |
@@ -103,7 +103,7 @@ with Cmd-Z.
 
 - **Lock** (top right) freezes every control, so a stray click or key press changes nothing. It
   stays locked after a relaunch.
-- **Signal loss:** if Art-Net stops (desk reboot, cable pulled), Cuemodo Cyc either holds the last
+- **Signal loss:** if Art-Net stops (desk reboot, cable pulled), Cyc either holds the last
   look (the default) or fades to black after the time you set. The next packet brings the look
   back.
 - If the projector display drops out and comes back, the output reopens on it by itself.

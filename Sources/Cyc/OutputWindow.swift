@@ -23,7 +23,7 @@ final class OutputWindow: NSWindow {
     }
 
     // Borderless windows refuse focus by default; allow it so a click on the
-    // output brings Cuemodo Cyc forward and Cmd-T reaches its menu.
+    // output brings Cyc forward and Cmd-T reaches its menu.
     override var canBecomeKey: Bool { true }
 
     /// Hide the mouse pointer while it is over the projector image.

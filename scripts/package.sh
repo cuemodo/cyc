@@ -1,7 +1,7 @@
 #!/bin/bash
-# Wraps the Swift package into "Cuemodo Cyc.app", signs it with a Developer ID
+# Wraps the Swift package into "Cyc.app", signs it with a Developer ID
 # certificate and has Apple notarize it, so it opens on any Mac without a
-# Gatekeeper warning. The result is dist/Cuemodo-Cyc-<version>.zip; for a
+# Gatekeeper warning. The result is dist/Cyc-<version>.zip; for a
 # release, scripts/make-dmg.sh then puts the app into a DMG.
 #
 #   scripts/package.sh                 build, sign, notarize, staple, zip
@@ -28,7 +28,7 @@ cd "$(dirname "$0")/.."
 notarize=true
 [[ "${1:-}" == "--no-notarize" ]] && notarize=false
 
-name="Cuemodo Cyc"
+name="Cyc"
 executable="Cyc"
 bundle_id="io.cuemodo.cyc"
 identity="${SIGN_IDENTITY:-Developer ID Application}"
@@ -38,7 +38,7 @@ build=$(git rev-list --count HEAD)
 
 dist="dist"
 app="$dist/$name.app"
-zip="$dist/Cuemodo-Cyc-$version.zip"
+zip="$dist/Cyc-$version.zip"
 
 # A notarized build is a release candidate. It must come from a committed state
 # (the build number is the commit count, see Info.plist below) that is tagged
@@ -129,7 +129,7 @@ if ! $notarize; then
 fi
 
 echo "==> Notarizing with keychain profile \"$profile\" (takes a few minutes)"
-upload="$(mktemp -d)/Cuemodo-Cyc-$version.zip"
+upload="$(mktemp -d)/Cyc-$version.zip"
 ditto -c -k --keepParent "$app" "$upload"
 xcrun notarytool submit "$upload" --keychain-profile "$profile" --wait
 xcrun stapler staple "$app"

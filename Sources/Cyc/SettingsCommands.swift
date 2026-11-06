@@ -43,7 +43,7 @@ struct SettingsCommands: Commands {
         guard !output.isLocked else { return }
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.json]
-        panel.message = "Open Cuemodo Cyc settings. They replace the current ones."
+        panel.message = "Open Cyc settings. They replace the current ones."
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             try keeper.load(from: url)

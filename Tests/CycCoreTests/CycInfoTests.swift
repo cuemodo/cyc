@@ -3,7 +3,7 @@ import XCTest
 
 final class CycInfoTests: XCTestCase {
     func testNameUsesBrandSpelling() {
-        XCTAssertEqual(CycInfo.name, "Cuemodo Cyc")
+        XCTAssertEqual(CycInfo.name, "Cyc")
     }
 
     func testVersionIsThreeNumbers() {

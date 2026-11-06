@@ -1,6 +1,6 @@
 # Architecture
 
-Cuemodo Cyc is a small native macOS app that makes projectors behave like one DMX fixture. It
+Cyc is a small native macOS app that makes projectors behave like one DMX fixture. It
 receives Art-Net, turns the fixture's channels into a solid color or a top-to-bottom gradient, and
 draws that on the projector output through a few mapped quads. Everything outside the quads stays
 black, which hides projector overlap and light spilling outside the wash area.
@@ -103,7 +103,7 @@ edges are refused.
 
 ## Settings
 
-One JSON file, `~/Library/Application Support/Cuemodo Cyc/settings.json`, holds the universe,
+One JSON file, `~/Library/Application Support/Cyc/settings.json`, holds the universe,
 fixture (address and mode), output source, Manual colors, display, mapping and the show options
 below. It
 starts with `"format": "cuemodo-cyc-settings"` and a version number. Cyc loads it at launch and saves

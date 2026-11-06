@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Cuemodo's look, matching cuemodo.io: amber for the name and accents, the
+/// Cuemodo's look, matching cuemodo.io: amber for accents, the
 /// system font, on the standard macOS dark window background.
 enum Brand {
     static let amber = Color(hex: 0xffb347)
@@ -30,13 +30,5 @@ extension View {
             .textCase(.uppercase)
             .tracking(2.5)
             .foregroundStyle(Brand.label)
-    }
-
-    /// The app name, like the site's amber heading.
-    func brandTitle() -> some View {
-        self
-            .font(.title.bold())
-            .tracking(-0.5)
-            .foregroundStyle(Brand.amber)
     }
 }

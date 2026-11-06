@@ -69,16 +69,23 @@ extension NSImage {
     }
 }
 
-/// The About panel's small print: a link to cuemodo.io, centered like the
-/// rest of the panel.
+/// The About panel's small print: who makes the app and a link to cuemodo.io,
+/// centered like the rest of the panel.
 private var aboutCredits: NSAttributedString {
     let paragraph = NSMutableParagraphStyle()
     paragraph.alignment = .center
-    return NSAttributedString(string: "cuemodo.io", attributes: [
-        .link: CycInfo.website,
-        .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+    let font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    let credits = NSMutableAttributedString(string: "by Cuemodo\n", attributes: [
+        .font: font,
+        .foregroundColor: NSColor.labelColor,
         .paragraphStyle: paragraph,
     ])
+    credits.append(NSAttributedString(string: "cuemodo.io", attributes: [
+        .link: CycInfo.website,
+        .font: font,
+        .paragraphStyle: paragraph,
+    ]))
+    return credits
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {

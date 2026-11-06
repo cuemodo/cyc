@@ -1,4 +1,4 @@
-# Cuemodo Cyc
+# Cyc
 
 A macOS app that makes projectors act as one DMX fixture: it receives Art-Net (sACN later), turns
 the fixture's channels into a color or a top-to-bottom gradient, and draws it full screen on the
@@ -31,4 +31,5 @@ Read these before larger changes:
 
 ## Naming
 
-Write "Cuemodo Cyc" in prose. Lowercase `cyc` for the repo and folder names.
+Write "Cyc" in prose and in the app. Use "Cyc by Cuemodo" on public listings, where the short name
+is hard to search for. Lowercase `cyc` for the repo and folder names.

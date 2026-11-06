@@ -1,11 +1,11 @@
 #!/bin/bash
-# Puts the notarized "Cuemodo Cyc.app" from scripts/package.sh into a DMG with
+# Puts the notarized "Cyc.app" from scripts/package.sh into a DMG with
 # a drag-to-Applications window, then signs, notarizes and staples the DMG
 # itself, so it opens on any Mac without a Gatekeeper warning. The result is
-# dist/Cuemodo-Cyc-<version>.dmg.
+# dist/Cyc-<version>.dmg.
 #
-#   scripts/make-dmg.sh                       uses dist/Cuemodo Cyc.app
-#   scripts/make-dmg.sh path/to/Cuemodo\ Cyc.app
+#   scripts/make-dmg.sh                       uses dist/Cyc.app
+#   scripts/make-dmg.sh path/to/Cyc.app
 #   scripts/make-dmg.sh --no-notarize         build and sign only (quick layout check)
 #
 # A DMG (disk image) is the usual way to hand out a Mac app: double-click it,
@@ -22,7 +22,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 notarize=true
-app="dist/Cuemodo Cyc.app"
+app="dist/Cyc.app"
 for arg in "$@"; do
     case "$arg" in
         --no-notarize) notarize=false ;;
@@ -43,11 +43,11 @@ command -v create-dmg >/dev/null || {
 }
 
 version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$app/Contents/Info.plist")
-dmg="dist/Cuemodo-Cyc-$version.dmg"
+dmg="dist/Cyc-$version.dmg"
 
 echo "==> Building $dmg from $app"
 rm -f "$dmg"
-create-dmg --volname "Cuemodo Cyc" --volicon "$app/Contents/Resources/AppIcon.icns" \
+create-dmg --volname "Cyc" --volicon "$app/Contents/Resources/AppIcon.icns" \
     --window-size 500 300 --icon-size 96 \
     --icon "$(basename "$app")" 125 120 --app-drop-link 375 120 \
     "$dmg" "$app"

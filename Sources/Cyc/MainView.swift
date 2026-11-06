@@ -11,26 +11,15 @@ struct MainView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                if let mark = NSImage.resource("CuemodoMark") {
-                    Image(nsImage: mark)
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 44, height: 44)
-                }
-                // A wordmark, so all lowercase like the "cuemodo" logo. The
-                // app's name stays "Cuemodo Cyc" everywhere else.
-                Text(CycInfo.name.lowercased())
-                    .brandTitle()
+            HStack {
+                Text("Output")
+                    .sectionTitle()
                 Spacer()
                 lockButton
             }
-            Divider()
 
             // Show lock: nothing below reacts until unlocked.
             Group {
-                Text("Output")
-                    .sectionTitle()
                 HStack(alignment: .center, spacing: 16) {
                     outputButton
                     // A grid, so both pickers start at the same left edge

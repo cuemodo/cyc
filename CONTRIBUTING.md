@@ -1,6 +1,6 @@
-# Contributing to Cuemodo Cyc
+# Contributing to Cyc
 
-Thanks for your interest. This page is for building Cuemodo Cyc from source and changing it. To
+Thanks for your interest. This page is for building Cyc from source and changing it. To
 simply use the app, download it from the [releases page](https://github.com/cuemodo/cyc/releases)
 and see the [README](README.md).
 
@@ -24,7 +24,7 @@ swift test
 Or open `Package.swift` in Xcode and press Run.
 
 When run with `swift run`, macOS asks for network access on behalf of Terminal (or your terminal
-app), not Cuemodo Cyc.
+app), not Cyc.
 
 ## Layout
 
@@ -59,7 +59,8 @@ Read these before larger changes:
 - **Dependencies:** none unless clearly worth it, and only under permissive licenses (MIT, BSD,
   Apache 2.0).
 - **Originality:** our own code only; never copy another product's code, UI or manuals.
-- **Naming:** write "Cuemodo Cyc" in prose, lowercase `cyc` for the repo and folder names.
+- **Naming:** write "Cyc" in prose and in the app, "Cyc by Cuemodo" on public listings, lowercase
+  `cyc` for the repo and folder names.
 - Update the [roadmap](docs/roadmap.md) as steps land and add new decisions to the
   [decision log](docs/decisions.md).
 
@@ -108,9 +109,9 @@ accepted the build. If a step fails before the push, delete the local tag
    `Bump version to X.Y.Z`.
 2. Tag that commit locally (do not push yet):
    ```sh
-   git tag -a vX.Y.Z -m "Cuemodo Cyc X.Y.Z"
+   git tag -a vX.Y.Z -m "Cyc X.Y.Z"
    ```
-3. Build, sign and notarize the app (writes `dist/Cuemodo Cyc.app` and a zip of it):
+3. Build, sign and notarize the app (writes `dist/Cyc.app` and a zip of it):
    ```sh
    scripts/package.sh
    ```
@@ -118,7 +119,7 @@ accepted the build. If a step fails before the push, delete the local tag
    `vX.Y.Z` (the version in `CycInfo.version`), or if that tag is already on GitHub (the version
    was released already).
 4. Put the app in a signed, notarized DMG with a drag-to-Applications window (writes
-   `dist/Cuemodo-Cyc-X.Y.Z.dmg`):
+   `dist/Cyc-X.Y.Z.dmg`):
    ```sh
    scripts/make-dmg.sh
    ```
@@ -131,10 +132,10 @@ accepted the build. If a step fails before the push, delete the local tag
 6. Create a draft release named after the tag, with the DMG attached, then edit the notes on
    GitHub and click **Publish**:
    ```sh
-   gh release create "$tag" "dist/Cuemodo-Cyc-${tag#v}.dmg" --verify-tag \
+   gh release create "$tag" "dist/Cyc-${tag#v}.dmg" --verify-tag \
      --title "$tag" --notes-from-tag --draft
    ```
-   `${tag#v}` is the tag without its leading `v`, so `v0.1.0` gives `Cuemodo-Cyc-0.1.0.dmg`.
+   `${tag#v}` is the tag without its leading `v`, so `v0.1.0` gives `Cyc-0.1.0.dmg`.
 
 Both scripts take `--no-notarize` to stop after signing, for a quick check of the app or the DMG
 window. Both read these environment variables:
