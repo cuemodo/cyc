@@ -135,3 +135,7 @@ Found a bug or have an idea? Open an issue on
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+## Credits
+
+Art-Net™ Designed by and Copyright Artistic Licence Engineering Ltd
